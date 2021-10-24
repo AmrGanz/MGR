@@ -6,7 +6,7 @@ A TUI interface to navigate and view OpenShift 4 must-gather files.
 ~~~
 # ./mgr <MG path>
 ~~~
-- Or, you can clone the project and build your own executable files as follows:
+- Or, you can clone the project and build your own executable files as follows [Recommended]:
 ~~~
 # git clone https://github.com/AmrGanz/MGR.git
 # cd MGR
