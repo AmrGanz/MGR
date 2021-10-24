@@ -144,14 +144,13 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 			TextViewData = ""
 			files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/core/nodes/")
 
-			// Print a summerized nodes status
 			now := time.Now().UTC()
+
 			Output := []string{"NAME" + "|" + "STATUS" + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSION" + "|" + "INTERNAL-IP" + "|" + "EXTERNAL-IP" + "|" + "OS-IMAGE" + "|" + "KERNEL-VERSION" + "|" + "CONTAINER-RUNTIME" + "\n"}
 			for _, file := range files {
 				yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + file.Name())
 				m := make(map[string]interface{})
 				yaml.Unmarshal([]byte(yfile), m)
-
 				name := m["metadata"].(map[interface{}]interface{})["name"]
 				nameS := fmt.Sprintf("%v", name)
 
@@ -204,7 +203,31 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 
 				version := m["status"].(map[interface{}]interface{})["nodeInfo"].(map[interface{}]interface{})["kubeletVersion"]
 				versionS := fmt.Sprintf("%v", version)
-				Output = append(Output, nameS+"|"+statusS+"|"+rolesS+"|"+age+"|"+versionS+"\n")
+
+				IPs := m["status"].(map[interface{}]interface{})["addresses"].([]interface{})
+				internalIPS := ""
+				externalIPS := ""
+				for i := range IPs {
+					if IPs[i].(map[interface{}]interface{})["type"] == "InternalIP" {
+						internalIP := IPs[i].(map[interface{}]interface{})["address"]
+						internalIPS = fmt.Sprintf("%v", internalIP)
+					} else if IPs[i].(map[interface{}]interface{})["type"] == "ExternalIP" {
+						externalIP := IPs[i].(map[interface{}]interface{})["address"]
+						externalIPS = fmt.Sprintf("%v", externalIP)
+
+					}
+				}
+
+				osImage := m["status"].(map[interface{}]interface{})["nodeInfo"].(map[interface{}]interface{})["osImage"]
+				osImageS := fmt.Sprintf("%v", osImage)
+
+				kernelVersion := m["status"].(map[interface{}]interface{})["nodeInfo"].(map[interface{}]interface{})["kernelVersion"]
+				kernelVersionS := fmt.Sprintf("%v", kernelVersion)
+
+				contRuntime := m["status"].(map[interface{}]interface{})["nodeInfo"].(map[interface{}]interface{})["containerRuntimeVersion"]
+				contRuntimeS := fmt.Sprintf("%v", contRuntime)
+
+				Output = append(Output, nameS+"|"+statusS+"|"+rolesS+"|"+age+"|"+versionS+"|"+internalIPS+"|"+externalIPS+"|"+osImageS+"|"+kernelVersionS+"|"+contRuntimeS+"\n")
 			}
 			FormatedOutput := columnize.SimpleFormat(Output)
 			TextView.SetText(FormatedOutput)
