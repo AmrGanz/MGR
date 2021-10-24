@@ -1,0 +1,9 @@
+6 Lists
+Global variables:
+- list_item_name "Selected item that is passed to the list's function"
+- FirstListItem
+- SecondListItem
+- ThirdListItem
+- FourthListItem
+- FifthListItem
+- SixthListItem
