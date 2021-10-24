@@ -17,6 +17,7 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 	TextView.ScrollToBeginning()
 	ThirdList.Clear()
 	FourthList.Clear()
+	FifthList.Clear()
 	SixthList.Clear()
 
 	ThirdList.SetTitle("")
