@@ -1,5 +1,5 @@
-# MGR "Must Gather Reader" <- not the final name
-A TUI interface to navigate and view OpenShift 4 must-gather files.
+# MGR "Must Gather Reader" 
+MGR "_not the final name_" is a simple TUI interface to navigate and view OpenShift 4 must-gather files.
 
 # How to run it:
 - Download and run the executable file "mgr":
