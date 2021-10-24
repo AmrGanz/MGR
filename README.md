@@ -35,6 +35,7 @@ A TUI interface to navigate and view OpenShift 4 must-gather files.
 
 # To be added Features "TBA":
 - Color coding
+- Dynamically set the initial size of the interface areas according to the initial terminal size
 - Display and search containers full logs
 - Keyboard shourtcuts
 - Descrypt Secrets, and MachineConfigs
