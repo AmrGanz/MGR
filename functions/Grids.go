@@ -162,8 +162,8 @@ func CreateUI() {
 		AddItem("Projects", "", 0, nil).
 		AddItem("Nodes", "", 0, nil).
 		AddItem("Operators", "", 0, nil).
-		// AddItem("MCP", "", 0, nil).
-		// AddItem("MC", "", 0, nil).
+		AddItem("MCP", "", 0, nil).
+		AddItem("MC", "", 0, nil).
 		AddItem("PV", "", 0, nil)
 	FirstList.SetSelectedFunc(FirstListOnSelect)
 	// inittializing the FourthList widget with common attributes

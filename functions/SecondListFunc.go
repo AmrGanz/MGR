@@ -219,9 +219,20 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 		ThirdList.
 			AddItem("YAML", "", 0, nil).
 			AddItem("Summary", "", 0, nil)
+	} else if FirstListItem == "MCP" {
+		ThirdList.SetTitle("Info")
+		ThirdList.
+			AddItem("Info", "", 0, nil).
+			AddItem("YAML", "", 0, nil)
+	} else if FirstListItem == "MC" {
+		ThirdList.SetTitle("Info")
+		ThirdList.
+			AddItem("Info", "", 0, nil).
+			AddItem("YAML", "", 0, nil)
 	} else if FirstListItem == "PV" {
 		ThirdList.SetTitle("Info")
 		ThirdList.
+			AddItem("Info", "", 0, nil).
 			AddItem("YAML", "", 0, nil)
 	}
 }

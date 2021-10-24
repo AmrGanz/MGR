@@ -1664,6 +1664,200 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.SetText(FormatedOutput)
 		TextView.ScrollToBeginning()
 		TextViewData = FormatedOutput
+	} else if FirstListItem == "MCP" && ThirdListItem == "Info" {
+		// Cleaning TextView and TextViewData
+		TextView.Clear()
+		TextViewData = ""
+		Output := []string{"NAME" + "|" + "CONFIG" + "|" + "UPDATED" + "|" + "UPDATING" + "|" + "DEGRADED" + "|" + "MACHINECOUNT" + "|" + "READYMACHINECOUNT" + "|" + "UPDATEDMACHINECOUNT" + "|" + "DEGRADEDMACHINECOUNT" + "|" + "AGE" + "\n"}
+
+		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + SecondListItem + ".yaml")
+
+		m := make(map[string]interface{})
+		yaml.Unmarshal([]byte(yfile), m)
+
+		name := m["metadata"].(map[interface{}]interface{})["name"]
+		nameS := fmt.Sprintf("%v", name)
+
+		config := m["status"].(map[interface{}]interface{})["configuration"].(map[interface{}]interface{})["name"]
+		configS := fmt.Sprintf("%v", config)
+
+		status := m["status"].(map[interface{}]interface{})["conditions"].([]interface{})
+		updatedS := ""
+		updatingS := ""
+		degradedS := ""
+		for i := range status {
+			if status[i].(map[interface{}]interface{})["type"] == "Updated" {
+				if status[i].(map[interface{}]interface{})["status"] == "True" {
+					updatedS = "True"
+				} else {
+					updatedS = "False"
+				}
+
+			} else if status[i].(map[interface{}]interface{})["type"] == "Updating" {
+				if status[i].(map[interface{}]interface{})["status"] == "True" {
+					updatingS = "True"
+				} else {
+					updatingS = "False"
+				}
+			} else if status[i].(map[interface{}]interface{})["type"] == "Degraded" {
+				if status[i].(map[interface{}]interface{})["status"] == "True" {
+					degradedS = "True"
+				} else {
+					degradedS = "False"
+				}
+			}
+
+		}
+		machineCount := m["status"].(map[interface{}]interface{})["machineCount"]
+		machineCountS := fmt.Sprintf("%v", machineCount)
+
+		machineReady := m["status"].(map[interface{}]interface{})["readyMachineCount"]
+		machineReadyS := fmt.Sprintf("%v", machineReady)
+
+		machineUpdated := m["status"].(map[interface{}]interface{})["updatedMachineCount"]
+		machineUpdatedS := fmt.Sprintf("%v", machineUpdated)
+
+		machineDegraded := m["status"].(map[interface{}]interface{})["degradedMachineCount"]
+		machineDegradedS := fmt.Sprintf("%v", machineDegraded)
+
+		now := time.Now().UTC()
+		CreationTime := m["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+		CreationTimeS := fmt.Sprintf("%v", CreationTime)
+		t1, _ := time.Parse(time.RFC3339, CreationTimeS)
+		diff := now.Sub(t1).Seconds()
+		diffI := int(diff)
+		seconds := strconv.Itoa((diffI % 60))
+		minutes := strconv.Itoa((diffI / 60) % 60)
+		hours := strconv.Itoa((diffI / 360) % 24)
+		days := strconv.Itoa((diffI / 86400))
+		age := ""
+		if days != "0" {
+			age = days + "d" + hours + "h"
+		} else if days == "0" && hours != "" {
+			age = hours + "h" + minutes + "m"
+		} else if hours == "0" {
+			age = minutes + "m" + seconds + "s"
+		}
+		Output = append(Output, nameS+"|"+configS+"|"+updatedS+"|"+updatingS+"|"+degradedS+"|"+machineCountS+"|"+machineReadyS+"|"+machineUpdatedS+"|"+machineDegradedS+"|"+age+"\n")
+
+		FormatedOutput := columnize.SimpleFormat(Output)
+		TextView.SetText(FormatedOutput)
+		TextView.ScrollToBeginning()
+		TextViewData = FormatedOutput
+
+	} else if FirstListItem == "MCP" && ThirdListItem == "YAML" {
+		mcpFile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + SecondListItem + ".yaml")
+		TextView.SetText(string(mcpFile))
+		TextView.ScrollToBeginning()
+	} else if FirstListItem == "MC" && ThirdListItem == "Info" {
+		// Cleaning TextView and TextViewData
+		TextView.Clear()
+		TextViewData = ""
+		now := time.Now().UTC()
+		Output := []string{"NAME" + "|" + "GENERATEDBYCONTROLLER" + "|" + "IGNITIONVERSION" + "|" + "AGE" + "\n"}
+		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + SecondListItem + ".yaml")
+
+		m := make(map[string]interface{})
+		yaml.Unmarshal([]byte(yfile), m)
+
+		name := m["metadata"].(map[interface{}]interface{})["name"]
+		nameS := fmt.Sprintf("%v", name)
+		SecondList.AddItem(nameS, "", 0, nil)
+
+		// TBA
+		// ganaratedBy := m["metadata"].(map[interface{}]interface{})["annotations"]
+		// generatedByS := fmt.Sprintf("%v", ganaratedBy)
+		generatedByS := "TBA"
+
+		ignitionVersion := m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["ignition"].(map[interface{}]interface{})["version"]
+		ignitionVersionS := fmt.Sprintf("%v", ignitionVersion)
+
+		CreationTime := m["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+		CreationTimeS := fmt.Sprintf("%v", CreationTime)
+		t1, _ := time.Parse(time.RFC3339, CreationTimeS)
+		diff := now.Sub(t1).Seconds()
+		diffI := int(diff)
+		seconds := strconv.Itoa((diffI % 60))
+		minutes := strconv.Itoa((diffI / 60) % 60)
+		hours := strconv.Itoa((diffI / 360) % 24)
+		days := strconv.Itoa((diffI / 86400))
+		age := ""
+		if days != "0" {
+			age = days + "d" + hours + "h"
+		} else if days == "0" && hours != "" {
+			age = hours + "h" + minutes + "m"
+		} else if hours == "0" {
+			age = minutes + "m" + seconds + "s"
+		}
+		Output = append(Output, nameS+"|"+generatedByS+"|"+ignitionVersionS+"|"+age+"\n")
+
+		FormatedOutput := columnize.SimpleFormat(Output)
+		TextView.SetText(FormatedOutput)
+		TextView.ScrollToBeginning()
+		TextViewData = FormatedOutput
+	} else if FirstListItem == "MC" && ThirdListItem == "YAML" {
+		mcpFile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + SecondListItem + ".yaml")
+		TextView.SetText(string(mcpFile))
+		TextView.ScrollToBeginning()
+	} else if FirstListItem == "PV" && ThirdListItem == "Info" {
+		// Cleaning TextView and TextViewData
+		TextView.Clear()
+		TextViewData = ""
+		now := time.Now().UTC()
+		Output := []string{"NAME" + "|" + "CAPACITY" + "|" + "ACCESS MODE" + "|" + "RECLAIM POLICY" + "|" + "STATUS" + "|" + "CLAIM" + "|" + "STORAGECLASS" + "|" + "AGE" + "\n"}
+		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/persistentvolumes/" + SecondListItem + ".yaml")
+
+		m := make(map[string]interface{})
+		yaml.Unmarshal([]byte(yfile), m)
+
+		name := m["metadata"].(map[interface{}]interface{})["name"]
+		nameS := fmt.Sprintf("%v", name)
+		SecondList.AddItem(nameS, "", 0, nil)
+		capacity := m["spec"].(map[interface{}]interface{})["capacity"].(map[interface{}]interface{})["storage"]
+		capacityS := fmt.Sprintf("%v", capacity)
+
+		access := m["spec"].(map[interface{}]interface{})["accessModes"]
+		accessS := fmt.Sprintf("%v", access)
+		accessS = strings.Replace(accessS, "[", "", -1)
+		accessS = strings.Replace(accessS, "]", "", -1)
+
+		reclaim := m["spec"].(map[interface{}]interface{})["claimRef"].(map[interface{}]interface{})["name"]
+		reclaimS := fmt.Sprintf("%v", reclaim)
+
+		status := m["status"].(map[interface{}]interface{})["phase"]
+		statusS := fmt.Sprintf("%v", status)
+
+		claim := m["metadata"].(map[interface{}]interface{})["name"]
+		claimS := fmt.Sprintf("%v", claim)
+
+		storageclass := m["spec"].(map[interface{}]interface{})["storageClassName"]
+		storageclassS := fmt.Sprintf("%v", storageclass)
+
+		CreationTime := m["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+		CreationTimeS := fmt.Sprintf("%v", CreationTime)
+		t1, _ := time.Parse(time.RFC3339, CreationTimeS)
+		diff := now.Sub(t1).Seconds()
+		diffI := int(diff)
+		seconds := strconv.Itoa((diffI % 60))
+		minutes := strconv.Itoa((diffI / 60) % 60)
+		hours := strconv.Itoa((diffI / 360) % 24)
+		days := strconv.Itoa((diffI / 86400))
+		age := ""
+		if days != "0" {
+			age = days + "d" + hours + "h"
+		} else if days == "0" && hours != "" {
+			age = hours + "h" + minutes + "m"
+		} else if hours == "0" {
+			age = minutes + "m" + seconds + "s"
+		}
+
+		Output = append(Output, nameS+"|"+capacityS+"|"+accessS+"|"+reclaimS+"|"+statusS+"|"+claimS+"|"+storageclassS+"|"+age+"\n")
+
+		FormatedOutput := columnize.SimpleFormat(Output)
+		TextView.SetText(FormatedOutput)
+		TextView.ScrollToBeginning()
+		TextViewData = FormatedOutput
+
 	} else if FirstListItem == "PV" && ThirdListItem == "YAML" {
 		pvFile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/persistentvolumes/" + SecondListItem + ".yaml")
 		TextView.SetText(string(pvFile))
