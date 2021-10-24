@@ -19,7 +19,7 @@ A TUI interface to navigate and view OpenShift 4 must-gather files.
 - Most of the flow will start from List 1 then you have new options to choose from in List 2 and so on till you finally get an output in the Text Output area
 - Sometimes you will ge the output in the Text Area from selecting options in List 2, so you don't have to always get it from the last List
 
-# A screenshot of the main interface:
+# A screenshot of the main interface showing an example output:
 ![Alt text](https://github.com/AmrGanz/MGR/blob/main/MainInterface.png?raw=true)
 
 # Completed Features:
