@@ -1,4 +1,4 @@
-# MGR "Must Gather Reader"
+# MGR "Must Gather Reader" <- not the final name
 A TUI interface to navigate and view OpenShift 4 must-gather files.
 
 # How to run it:
