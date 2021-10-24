@@ -38,8 +38,8 @@ var SixthListItem string = ""
 var TextViewData string = ""
 var SearchResult []string = []string{""}
 
-// var height = 1
-var width = 16
+var height = 1
+var width = 15
 var rows []int = []int{1, 20, 10, 0, 1}
 var columns []int = []int{width, width, width, width, 0, width, width, width}
 
@@ -65,15 +65,7 @@ func OnSearch() {
 
 }
 
-// func OnSearchMode() {
-// 	App.
-// 		SetRoot(SearchModeGrid, true).
-// 		SetFocus(SearchModeGrid).
-// 		EnableMouse(true)
-// }
-
 func OnCopyMode() {
-	// TO BE IMPLEMENTED
 	App.
 		SetRoot(CopyModeGrid, true).
 		SetFocus(TextView).EnableMouse(false)
@@ -227,15 +219,7 @@ func CreateUI() {
 		AddItem(SearchBox, 4, 4, 1, 3, 0, 0, false).
 		AddItem(SearchButton, 4, 7, 1, 1, 0, 0, false).
 		AddItem(TextView, 1, 4, 3, 4, 0, 0, false)
-	// SearchModeGrid.
-	// 	SetRows(rows...).
-	// 	SetColumns(columns...).
-	// 	SetBorders(true).
-	// 	AddItem(SearchBox, 0, 0, 1, 5, 0, 0, false).
-	// 	AddItem(SearchButton, 0, 5, 1, 1, 0, 0, false).
-	// 	AddItem(CopyModeButton, 0, 6, 1, 1, 0, 0, false).
-	// 	AddItem(GoBackButton, 0, 7, 1, 1, 0, 0, false).
-	// 	AddItem(TextView, 1, 0, 3, 8, 0, 0, false)
+
 	CopyModeGrid.
 		SetRows(rows...).
 		SetColumns(columns...).

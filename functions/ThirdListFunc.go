@@ -918,8 +918,11 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 				for i := 0; i < len(x); i++ {
 					y := x[i].(map[interface{}]interface{})
 					now := time.Now().UTC()
+
 					name := y["metadata"].(map[interface{}]interface{})["name"]
 					nameS := fmt.Sprintf("%v", name)
+					FourthList.AddItem(nameS, "", 0, nil)
+
 					ready := y["status"].(map[interface{}]interface{})["readyReplicas"]
 					readyS := fmt.Sprintf("%v", ready)
 					UpToDate := "TBA"
@@ -967,6 +970,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					y := x[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
 					nameS := fmt.Sprintf("%v", name)
+					FourthList.AddItem(nameS, "", 0, nil)
 
 					revision := y["status"].(map[interface{}]interface{})["latestVersion"]
 					revisionS := fmt.Sprintf("%v", revision)
@@ -1013,6 +1017,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					y := x[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
 					nameS := fmt.Sprintf("%v", name)
+					FourthList.AddItem(nameS, "", 0, nil)
 
 					desired := y["status"].(map[interface{}]interface{})["desiredNumberScheduled"]
 					desiredS := fmt.Sprintf("%v", desired)
@@ -1078,6 +1083,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					y := x[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
 					nameS := fmt.Sprintf("%v", name)
+					FourthList.AddItem(nameS, "", 0, nil)
 
 					Stype := y["spec"].(map[interface{}]interface{})["type"]
 					StypeS := fmt.Sprintf("%v", Stype)
@@ -1157,6 +1163,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					y := x[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
 					nameS := fmt.Sprintf("%v", name)
+					FourthList.AddItem(nameS, "", 0, nil)
 
 					host := y["spec"].(map[interface{}]interface{})["host"]
 					hostS := fmt.Sprintf("%v", host)
@@ -1226,6 +1233,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					y := x[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
 					nameS := fmt.Sprintf("%v", name)
+					FourthList.AddItem(nameS, "", 0, nil)
 
 					tagsS := ""
 					if y["spec"].(map[interface{}]interface{})["tags"] != nil {
@@ -1284,6 +1292,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					y := x[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
 					nameS := fmt.Sprintf("%v", name)
+					FourthList.AddItem(nameS, "", 0, nil)
 
 					status := y["status"].(map[interface{}]interface{})["phase"]
 					statusS := fmt.Sprintf("%v", status)
@@ -1346,6 +1355,8 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					y := x[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
 					nameS := fmt.Sprintf("%v", name)
+					FourthList.AddItem(nameS, "", 0, nil)
+
 					dataS := ""
 					if y["data"] != nil {
 						data := y["data"].(map[interface{}]interface{})
@@ -1400,6 +1411,8 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					y := x[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
 					nameS := fmt.Sprintf("%v", name)
+					FourthList.AddItem(nameS, "", 0, nil)
+
 					dataS := ""
 					if y["data"] != nil {
 						data := y["data"].(map[interface{}]interface{})
@@ -1451,6 +1464,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 
 				name := m["metadata"].(map[interface{}]interface{})["name"]
 				nameS := fmt.Sprintf("%v", name)
+				FourthList.AddItem(nameS, "", 0, nil)
 
 				Package := m["spec"].(map[interface{}]interface{})["name"]
 				packageS := fmt.Sprintf("%v", Package)
@@ -1481,6 +1495,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 
 				name := m["metadata"].(map[interface{}]interface{})["name"]
 				nameS := fmt.Sprintf("%v", name)
+				FourthList.AddItem(nameS, "", 0, nil)
 
 				// display := m["metadata"].(map[interface{}]interface{})["name"]
 				// displayS := fmt.Sprintf("%v", display)

@@ -67,22 +67,49 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 
 		} else if ThirdListItem == "Deployment" {
 			// Table of Projects/Deployment
+			SixthList.
+				AddItem("Info", "", 0, nil).
+				AddItem("YAML", "", 0, nil)
 		} else if ThirdListItem == "DeploymentConfig" {
 			// Table of Projects/DeploymentConfig
+			SixthList.
+				AddItem("Info", "", 0, nil).
+				AddItem("YAML", "", 0, nil)
 		} else if ThirdListItem == "Daemonset" {
 			// Table of Projects/Daemonset
+			SixthList.
+				AddItem("Info", "", 0, nil).
+				AddItem("YAML", "", 0, nil)
 		} else if ThirdListItem == "Services" {
 			// Table of Projects/Services
+			SixthList.
+				AddItem("Info", "", 0, nil).
+				AddItem("YAML", "", 0, nil)
 		} else if ThirdListItem == "Routes" {
 			// Table of Projects/Routes
+			SixthList.
+				AddItem("Info", "", 0, nil).
+				AddItem("YAML", "", 0, nil)
 		} else if ThirdListItem == "Image Stream" {
 			// Table of Projects/Image Stream
+			SixthList.
+				AddItem("Info", "", 0, nil).
+				AddItem("YAML", "", 0, nil)
 		} else if ThirdListItem == "PVC" {
 			// Table of Projects/PVC
+			SixthList.
+				AddItem("Info", "", 0, nil).
+				AddItem("YAML", "", 0, nil)
 		} else if ThirdListItem == "ConfigMap" {
 			// Table of Projects/ConfigMap
+			SixthList.
+				AddItem("Info", "", 0, nil).
+				AddItem("YAML", "", 0, nil)
 		} else if ThirdListItem == "Secrets" {
 			// Table of Projects/Secrets
+			SixthList.
+				AddItem("Info", "", 0, nil).
+				AddItem("YAML", "", 0, nil)
 		}
 	}
 }
