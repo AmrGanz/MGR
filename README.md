@@ -27,13 +27,16 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 # A screenshot of the main interface showing an example output:
 ![Alt text](https://github.com/AmrGanz/MGR/blob/main/MainInterface.png?raw=true)
 
-# Completed Features:
+# Added Features:
 - Read Projects, Operators, Nodes, MCP, MC, and PersistentVolume resources details.
+- Text output is similar to what you get with the oc client
+- Quick navigation between cluster resources
 - Filter output text using the SearchBox
 - Copy from the output text using the CopyMode button
 - Ability to use the mouse
 
 # To be added Features "TBA":
+- More cluster reources to be added
 - Color coding
 - Dynamically set the initial size of the interface areas according to the initial terminal size
 - Display and search containers full logs
@@ -46,3 +49,4 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 - This software is using [tview](https://github.com/rivo/tview) go library
 - In my lab I am using go version go1.16.8
 - This tool is in a PoC phase and more features will be added to it soon
+- Please feel free to report any bugs or a required feature/enhancement
