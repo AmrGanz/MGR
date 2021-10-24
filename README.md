@@ -15,9 +15,12 @@ A TUI interface to navigate and view OpenShift 4 must-gather files.
 ~~~
 - The main interface is devided into multiple areas as shown in the following screenshot:
 ![Alt text](https://github.com/AmrGanz/MGR/blob/main/InterfaceAreas.png?raw=true)
-- You will always start with area "1" or List number 1
-- Most of the flow will start from List 1 then you have new options to choose from in List 2 and so on till you finally get an output in the Text Output area
-- Sometimes you will ge the output in the Text Area from selecting options in List 2, so you don't have to always get it from the last List
+- You will always start with area "1" or List number 1.
+- Most of the flow will start from List 1 then you have new options to choose from in List 2 and so on till you finally get an output in the Text Output area.
+- Sometimes you will ge the output in the Text Area from selecting options in List 2, so you don't have to always get it from the last List.
+- CopyMode button will bring focus to the contents in the Text Output area by hiding other areas.
+- While in the CopyMode, you can use your mouse to highlight and Select/Copy lines.
+- To go back to the main interfacr, press the Esc key in your keyboard.
 
 # A screenshot of the main interface showing an example output:
 ![Alt text](https://github.com/AmrGanz/MGR/blob/main/MainInterface.png?raw=true)
