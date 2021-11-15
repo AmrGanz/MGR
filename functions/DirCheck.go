@@ -47,7 +47,7 @@ func DirCheck() {
 					if mark < 2 {
 						fmt.Print("This is not a valid must-gather directory" + "\n")
 					} else {
-						// If we are sure this is a must-gather director, go get the base path
+						// If we are sure this is a must-gather director, go get the base path "the directory path containing the MG subdirectories"
 						DirPathTreeBuild()
 					}
 					if err != nil {
@@ -72,6 +72,7 @@ func DirPathTreeBuild() {
 			if info.Name() == "cluster-scoped-resources" {
 				mypath := strings.Split(path, "cluster-scoped-resources")
 				BasePath = mypath[0]
+				// Start the MGR interface
 				StartUI()
 			}
 			return nil
@@ -87,7 +88,6 @@ func StartUI() {
 	CreateUI()
 	App.SetInputCapture(KeyboardKeys).
 		SetRoot(MainGrid, true).
-		SetFocus(FirstList).
 		EnableMouse(true).
 		Run()
 

@@ -1,3 +1,5 @@
+// Where I create and initialize the TUI elements
+
 package functions
 
 import (
@@ -21,26 +23,26 @@ var CopyModeButton = tview.NewButton("Copy Mode")
 var SearchButton = tview.NewButton("Search")
 var GoBackButton = tview.NewButton("Go Back")
 var ActivePathBox = tview.NewTextView()
-var FirstList = tview.NewList()
-var SecondList = tview.NewList()
-var ThirdList = tview.NewList()
-var FourthList = tview.NewList()
-var FifthList = tview.NewList()
-var SixthList = tview.NewList()
+var List1 = tview.NewList()
+var List2 = tview.NewList()
+var List3 = tview.NewList()
+var List4 = tview.NewList()
+var List5 = tview.NewList()
+var List6 = tview.NewList()
 var TextView = tview.NewTextView()
 var MessageWindow = tview.NewModal()
-var FirstListItem string = ""
-var SecondListItem string = ""
-var ThirdListItem string = ""
-var FourthListItem string = ""
-var FifthListItem string = ""
-var SixthListItem string = ""
+var List1Item string = ""
+var List2Item string = ""
+var List3Item string = ""
+var List4Item string = ""
+var List5Item string = ""
+var List6Item string = ""
 var TextViewData string = ""
 var SearchResult []string = []string{""}
 
 var height = 1
 var width = 15
-var rows []int = []int{1, 20, 10, 0, 1}
+var rows []int = []int{height, 20, 10, 0, height}
 var columns []int = []int{width, width, width, width, 0, width, width, width}
 
 func OnSearch() {
@@ -96,7 +98,7 @@ func KeyboardKeys(event *tcell.EventKey) *tcell.EventKey {
 	// 		TextView.SetText(event.Name())
 	// 		return event
 	// 	} else if event.Key() == tcell.KeyTab {
-	// 		App.SetFocus(ThirdList)
+	// 		App.SetFocus(List3)
 	// 		return nil
 	// 	} else if event.Key() == tcell.KeyCtrlC {
 	// 		App.Stop()
@@ -144,12 +146,12 @@ func CreateUI() {
 	// SearchBox attributes
 	// SearchBox.SetBackgroundColor()   <--- To make it transparent
 
-	// inittializing the FirstList widget with common attributes
-	FirstList.
+	// inittializing the List1 widget with common attributes
+	List1.
 		SetBorder(true).
 		SetTitle("Resources")
-	FirstList.SetHighlightFullLine(true)
-	FirstList.
+	List1.SetHighlightFullLine(true)
+	List1.
 		ShowSecondaryText(false).
 		AddItem("Projects", "", 0, nil).
 		AddItem("Nodes", "", 0, nil).
@@ -157,45 +159,45 @@ func CreateUI() {
 		AddItem("MCP", "", 0, nil).
 		AddItem("MC", "", 0, nil).
 		AddItem("PV", "", 0, nil)
-	FirstList.SetSelectedFunc(FirstListOnSelect)
-	// inittializing the FourthList widget with common attributes
-	SecondList.
+	List1.SetSelectedFunc(FirstListOnSelect)
+	// inittializing the List4 widget with common attributes
+	List2.
 		SetBorder(true)
-	SecondList.
+	List2.
 		SetSelectedFunc(SecondListOnSelect).
 		ShowSecondaryText(false).
 		SetHighlightFullLine(true)
 
-	// setting FirstList widget common attributes
-	ThirdList.
+	// setting List1 widget common attributes
+	List3.
 		ShowSecondaryText(false).
 		SetBorder(true)
-	ThirdList.
+	List3.
 		SetSelectedFunc(ThirdListOnSelect).
 		SetHighlightFullLine(true)
 
-	// setting FirstList widget common attributes
-	FourthList.
+	// setting List1 widget common attributes
+	List4.
 		ShowSecondaryText(false).
 		SetBorder(true)
-	FourthList.
+	List4.
 		SetSelectedFunc(FourthListOnSelect).
 		SetHighlightFullLine(true)
 
-	// adding Resources to the SixthList and setting a separate "onselect" function for each item
-	FifthList.
+	// adding Resources to the List6 and setting a separate "onselect" function for each item
+	List5.
 		ShowSecondaryText(false).
 		SetBorder(true)
-	FifthList.
+	List5.
 		SetSelectedFunc(FifthListOnSelect).
 		SetHighlightFullLine(true)
 
-	// adding Resources to the SixthList and setting a separate "onselect" function for each item
-	SixthList.
+	// adding Resources to the List6 and setting a separate "onselect" function for each item
+	List6.
 		ShowSecondaryText(false).
 		SetBorder(true)
-	SixthList.SetHighlightFullLine(true)
-	SixthList.SetSelectedFunc(SixthListOnSelect)
+	List6.SetHighlightFullLine(true)
+	List6.SetSelectedFunc(SixthListOnSelect)
 
 	MessageWindow.SetTitle("Loading")
 
@@ -210,12 +212,12 @@ func CreateUI() {
 		AddItem(HelpButton, 0, 5, 1, 1, 0, 0, false).
 		AddItem(CopyModeButton, 0, 6, 1, 1, 0, 0, false).
 		AddItem(ExitButton, 0, 7, 1, 1, 0, 0, false).
-		AddItem(FirstList, 1, 0, 1, 1, 0, 0, false).
-		AddItem(SecondList, 1, 1, 1, 3, 0, 0, false).
-		AddItem(ThirdList, 2, 0, 3, 1, 0, 0, false).
-		AddItem(FourthList, 2, 1, 1, 2, 0, 0, false).
-		AddItem(FifthList, 3, 1, 2, 2, 0, 0, false).
-		AddItem(SixthList, 2, 3, 3, 1, 0, 0, false).
+		AddItem(List1, 1, 0, 1, 1, 0, 0, false).
+		AddItem(List2, 1, 1, 1, 3, 0, 0, false).
+		AddItem(List3, 2, 0, 3, 1, 0, 0, false).
+		AddItem(List4, 2, 1, 1, 2, 0, 0, false).
+		AddItem(List5, 3, 1, 2, 2, 0, 0, false).
+		AddItem(List6, 2, 3, 3, 1, 0, 0, false).
 		AddItem(SearchBox, 4, 4, 1, 3, 0, 0, false).
 		AddItem(SearchButton, 4, 7, 1, 1, 0, 0, false).
 		AddItem(TextView, 1, 4, 3, 4, 0, 0, false)

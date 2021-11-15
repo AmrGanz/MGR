@@ -12,7 +12,7 @@ func AddDirItemsToList(Item string, list *tview.List) {
 	if Item == "Projects" {
 		fileInfo, _ := ioutil.ReadDir(BasePath + "namespaces/")
 		if len(fileInfo) > 0 {
-			SecondList.AddItem("All", "", 0, nil)
+			List2.AddItem("All", "", 0, nil)
 			for _, info := range fileInfo {
 				projectname := strings.Split(info.Name(), ".yaml")
 				list.AddItem(projectname[0], "", 0, nil)

@@ -15,26 +15,26 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 	TextView.Clear()
 	TextViewData = ""
 	TextView.ScrollToBeginning()
-	ThirdList.Clear()
-	FourthList.Clear()
-	FifthList.Clear()
-	SixthList.Clear()
+	List3.Clear()
+	List4.Clear()
+	List5.Clear()
+	List6.Clear()
 
-	ThirdList.SetTitle("")
-	FourthList.SetTitle("")
-	FifthList.SetTitle("")
-	SixthList.SetTitle("")
-	// ThirdListItem, _ = FirstList.GetItemText(index)
-	SecondListItem = list_item_name
-	ActivePathBox.SetText(FirstListItem + " -> " + SecondListItem)
+	List3.SetTitle("")
+	List4.SetTitle("")
+	List5.SetTitle("")
+	List6.SetTitle("")
+	// List3Item, _ = List1.GetItemText(index)
+	List2Item = list_item_name
+	ActivePathBox.SetText(List1Item + " -> " + List2Item)
 
-	if FirstListItem == "Projects" {
-		if SecondListItem == "All Projects" {
-			ThirdList.Clear()
-			FourthList.Clear()
-			FifthList.Clear()
-			SixthList.Clear()
-			ThirdList.
+	if List1Item == "Projects" {
+		if List2Item == "All Projects" {
+			List3.Clear()
+			List4.Clear()
+			List5.Clear()
+			List6.Clear()
+			List3.
 				// AddItem("Summary", "", 0, nil).
 				AddItem("Pods", "", 0, nil).
 				AddItem("Deployment", "", 0, nil).
@@ -49,7 +49,7 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 				AddItem("Subscriptions", "", 0, nil).
 				AddItem("Operators", "", 0, nil)
 		} else {
-			ThirdList.
+			List3.
 				// AddItem("Summary", "", 0, nil).
 				AddItem("YAML", "", 0, nil).
 				AddItem("Events", "", 0, nil).
@@ -66,8 +66,8 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 				AddItem("Subscriptions", "", 0, nil).
 				AddItem("Operators", "", 0, nil)
 		}
-	} else if FirstListItem == "Nodes" {
-		if SecondListItem == "Nodes Summary" {
+	} else if List1Item == "Nodes" {
+		if List2Item == "Nodes Summary" {
 			// Cleaning TextView and TextViewData
 			TextView.Clear()
 			TextViewData = ""
@@ -138,7 +138,7 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 			TextView.SetText(FormatedOutput)
 			TextView.ScrollToBeginning()
 			TextViewData = FormatedOutput
-		} else if SecondListItem == "Nodes Details" {
+		} else if List2Item == "Nodes Details" {
 			// Cleaning TextView and TextViewData
 			TextView.Clear()
 			TextViewData = ""
@@ -234,28 +234,29 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 			TextView.ScrollToBeginning()
 			TextViewData = FormatedOutput
 		} else {
-			ThirdList.
+			List3.
 				AddItem("YAML", "", 0, nil).
 				AddItem("Summary", "", 0, nil)
 		}
-	} else if FirstListItem == "Operators" {
-		ThirdList.SetTitle("Info")
-		ThirdList.
+	} else if List1Item == "Operators" {
+		List3.SetTitle("Info")
+		List3.
 			AddItem("YAML", "", 0, nil).
 			AddItem("Summary", "", 0, nil)
-	} else if FirstListItem == "MCP" {
-		ThirdList.SetTitle("Info")
-		ThirdList.
+	} else if List1Item == "MCP" {
+		List3.SetTitle("Info")
+		List3.
 			AddItem("Info", "", 0, nil).
 			AddItem("YAML", "", 0, nil)
-	} else if FirstListItem == "MC" {
-		ThirdList.SetTitle("Info")
-		ThirdList.
-			AddItem("Info", "", 0, nil).
-			AddItem("YAML", "", 0, nil)
-	} else if FirstListItem == "PV" {
-		ThirdList.SetTitle("Info")
-		ThirdList.
+	} else if List1Item == "MC" {
+		List3.SetTitle("Info")
+		List3.
+			AddItem("Summary", "", 0, nil).
+			AddItem("YAML", "", 0, nil).
+			AddItem("Data", "", 0, nil)
+	} else if List1Item == "PV" {
+		List3.SetTitle("Info")
+		List3.
 			AddItem("Info", "", 0, nil).
 			AddItem("YAML", "", 0, nil)
 	}

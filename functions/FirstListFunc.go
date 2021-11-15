@@ -15,50 +15,50 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 	// Setting current choice in the ActivePathBox
 	TextView.Clear()
 	TextViewData = ""
-	SecondList.Clear()
-	ThirdList.Clear()
-	FourthList.Clear()
-	FifthList.Clear()
-	SixthList.Clear()
-	SecondList.SetTitle("")
-	ThirdList.SetTitle("")
-	FourthList.SetTitle("")
-	FifthList.SetTitle("")
-	SixthList.SetTitle("")
+	List2.Clear()
+	List3.Clear()
+	List4.Clear()
+	List5.Clear()
+	List6.Clear()
+	List2.SetTitle("")
+	List3.SetTitle("")
+	List4.SetTitle("")
+	List5.SetTitle("")
+	List6.SetTitle("")
 
-	// Setting the global variable FirstListItem
-	FirstListItem = list_item_name
+	// Setting the global variable List1Item
+	List1Item = list_item_name
 
 	// Adding selection path to the ActivePathBox
-	ActivePathBox.SetText(FirstListItem + " -> ")
+	ActivePathBox.SetText(List1Item + " -> ")
 	if list_item_name == "Projects" {
-		SecondList.SetTitle("Projects")
+		List2.SetTitle("Projects")
 		namespaces, _ := ioutil.ReadDir(BasePath + "namespaces/")
 		if len(namespaces) > 0 {
-			SecondList.AddItem("All Projects", "", 0, nil)
+			List2.AddItem("All Projects", "", 0, nil)
 			for _, project := range namespaces {
-				SecondList.AddItem(project.Name(), "", 0, nil)
+				List2.AddItem(project.Name(), "", 0, nil)
 			}
 		} else {
-			SecondList.AddItem("Empty", "", 0, nil)
+			List2.AddItem("Empty", "", 0, nil)
 		}
 	} else if list_item_name == "Nodes" {
-		SecondList.SetTitle("Nodes")
+		List2.SetTitle("Nodes")
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
 		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/core/nodes/")
-		SecondList.
+		List2.
 			AddItem("Nodes Summary", "", 0, nil).
 			AddItem("Nodes Details", "", 0, nil)
-		// Populate SecondList with nodes names
+		// Populate List2 with nodes names
 		for _, node := range files {
 			nodeName := strings.Split(node.Name(), ".yaml")
-			SecondList.AddItem(nodeName[0], "", 0, nil)
+			List2.AddItem(nodeName[0], "", 0, nil)
 		}
 
 	} else if list_item_name == "Operators" {
-		SecondList.SetTitle("Operators")
+		List2.SetTitle("Operators")
 		clusteroperators, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
 		Output := []string{"NAME" + "|" + "VERSION" + "|" + "AVAILABLE" + "|" + "PROGRESSINS" + "|" + "DEGRADED" + "|" + "SINCE" + "\n"}
 		m := make(map[interface{}]interface{})
@@ -68,7 +68,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 			operator := items[i].(map[interface{}]interface{})
 			name := operator["metadata"].(map[interface{}]interface{})["name"]
 			nameS := fmt.Sprintf("%v", name)
-			SecondList.AddItem(nameS, "", 0, nil)
+			List2.AddItem(nameS, "", 0, nil)
 
 			versions := operator["status"].(map[interface{}]interface{})["versions"].([]interface{})
 			versionS := ""
@@ -133,7 +133,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.ScrollToBeginning()
 		TextViewData = FormatedOutput
 	} else if list_item_name == "MCP" {
-		SecondList.SetTitle("MCP")
+		List2.SetTitle("MCP")
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
@@ -148,7 +148,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 
 			name := m["metadata"].(map[interface{}]interface{})["name"]
 			nameS := fmt.Sprintf("%v", name)
-			SecondList.AddItem(nameS, "", 0, nil)
+			List2.AddItem(nameS, "", 0, nil)
 
 			config := m["status"].(map[interface{}]interface{})["configuration"].(map[interface{}]interface{})["name"]
 			configS := fmt.Sprintf("%v", config)
@@ -218,7 +218,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = FormatedOutput
 
 	} else if list_item_name == "MC" {
-		SecondList.SetTitle("MC")
+		List2.SetTitle("MC")
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
@@ -233,7 +233,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 
 			name := m["metadata"].(map[interface{}]interface{})["name"]
 			nameS := fmt.Sprintf("%v", name)
-			SecondList.AddItem(nameS, "", 0, nil)
+			List2.AddItem(nameS, "", 0, nil)
 
 			// TBA
 			// ganaratedBy := m["metadata"].(map[interface{}]interface{})["annotations"]
@@ -267,7 +267,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.ScrollToBeginning()
 		TextViewData = FormatedOutput
 	} else if list_item_name == "PV" {
-		SecondList.SetTitle("PV")
+		List2.SetTitle("PV")
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
@@ -282,7 +282,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 
 			name := m["metadata"].(map[interface{}]interface{})["name"]
 			nameS := fmt.Sprintf("%v", name)
-			SecondList.AddItem(nameS, "", 0, nil)
+			List2.AddItem(nameS, "", 0, nil)
 			capacity := m["spec"].(map[interface{}]interface{})["capacity"].(map[interface{}]interface{})["storage"]
 			capacityS := fmt.Sprintf("%v", capacity)
 

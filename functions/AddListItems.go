@@ -5,12 +5,12 @@ import (
 )
 
 func AddListItems(list *tview.List) {
-	if list == ThirdList {
-		ThirdList.Clear()
-		FourthList.Clear()
-		FifthList.Clear()
-		SixthList.Clear()
-		if FirstListItem == "Projects" {
+	if list == List3 {
+		List3.Clear()
+		List4.Clear()
+		List5.Clear()
+		List6.Clear()
+		if List1Item == "Projects" {
 			list.
 				AddItem("YAML", "", 0, nil).
 				AddItem("Events", "", 0, nil).
@@ -24,15 +24,15 @@ func AddListItems(list *tview.List) {
 				AddItem("PVC", "", 0, nil).
 				AddItem("ConfigMap", "", 0, nil).
 				AddItem("Secrets", "", 0, nil)
-		} else if FirstListItem == "Nodes" {
+		} else if List1Item == "Nodes" {
 			list.
 				AddItem("Nodes Status", "", 0, nil).
 				AddItem("Utilization", "", 0, nil).
 				AddItem("Nodes Info", "", 0, nil).
 				AddItem("Used MC", "", 0, nil)
 		}
-	} else if list == SixthList {
-		if ThirdListItem == "Pods" {
+	} else if list == List6 {
+		if List3Item == "Pods" {
 			list.
 				AddItem("Info", "", 0, nil).
 				AddItem("YAML", "", 0, nil).
