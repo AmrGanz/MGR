@@ -46,7 +46,7 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 - ...
 
 # Notes:
-- This software is using [tview](https://github.com/rivo/tview) go library
+- This tool is using [tview](https://github.com/rivo/tview) go library
 - In my lab I am using go version go1.16.8
 - This tool is in a PoC phase and more features will be added to it soon
 - Please feel free to report any bugs or a required feature/enhancement
