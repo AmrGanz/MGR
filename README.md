@@ -36,6 +36,7 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 - Ability to use the mouse
 
 # To be added Features "TBA":
+- Read a MG that is generated from multiple images
 - More cluster reources to be added
 - Color coding
 - Dynamically set the initial size of the interface areas according to the initial terminal size
