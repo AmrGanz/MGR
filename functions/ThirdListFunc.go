@@ -245,7 +245,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 				for projectIndex := 0; projectIndex < len(namespaces); projectIndex++ {
 					if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/apps/daemonsets.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/apps/daemonsets.yaml")
-						m := make(map[interface{}]interface{})
+						m := make(map[string]interface{})
 						yaml.Unmarshal([]byte(yfile), m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
@@ -270,8 +270,28 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 								availableS := fmt.Sprintf("%v", available)
 
 								// To be enhanced "print key/value only"
-								nodeselector := y["spec"].(map[interface{}]interface{})["template"].(map[interface{}]interface{})["spec"].(map[interface{}]interface{})["nodeSelector"]
-								nodeselectorS := fmt.Sprintf("%v", nodeselector)
+								nodeselector := y["spec"].(map[interface{}]interface{})["template"].(map[interface{}]interface{})["spec"].(map[interface{}]interface{})["nodeSelector"].(map[interface{}]interface{})
+								// nodeselectorS := fmt.Sprintf("%v", nodeselector)
+								nodeselectorS := ""
+								count := len(nodeselector)
+								for key, value := range nodeselector {
+									if count > 1 {
+										if fmt.Sprintf("%v", value) != "" {
+											nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key) + ":" + fmt.Sprintf("%v", value) + ", "
+										} else {
+											nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key) + ", "
+										}
+
+										count--
+									} else {
+										if fmt.Sprintf("%v", value) != "" {
+											nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key) + ":" + fmt.Sprintf("%v", value)
+										} else {
+											nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key)
+										}
+									}
+
+								}
 
 								CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
 								CreationTimeS := fmt.Sprintf("%v", CreationTime)
@@ -844,6 +864,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		} else if List3Item == "Pods" {
 			TextView.Clear()
 			TextViewData = ""
+			List4.SetTitle("Pods")
 			Output = []string{"NAME" + "|" + "READY" + "|" + "STATUS" + "|" + "RESTARTS" + "|" + "AGE" + "\n"}
 			// Get project's pods "regardless of it's type/status" I can add the owner column if possible
 			if _, err := os.Stat(BasePath + "namespaces/" + List2Item + "/core/pods.yaml"); err == nil {
@@ -914,6 +935,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			yaml.Unmarshal([]byte(yfile), m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
+				List4.SetTitle("Deployments")
 				Output = []string{"NAME" + "|" + "READY" + "|" + "UP-TO-DATE" + "|" + "AVAILABLE" + "|" + "AGE"}
 				for i := 0; i < len(items); i++ {
 					y := items[i].(map[interface{}]interface{})
@@ -965,6 +987,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			yaml.Unmarshal([]byte(yfile), m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
+				List4.SetTitle("DeploymentConfig")
 				Output = []string{"NAME" + "|" + "REVISION" + "|" + "DESIRED" + "|" + "CURRENT" + "|" + "TRIGGERED BY" + "\n"}
 				for i := 0; i < len(items); i++ {
 					y := items[i].(map[interface{}]interface{})
@@ -1011,6 +1034,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			yaml.Unmarshal([]byte(yfile), m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
+				List4.SetTitle("Daemonsets")
 				Output = []string{"NAME" + "|" + "DESIRED" + "|" + "CURRENT" + "|" + "READY" + "|" + "UP-TO-DATE" + "|" + "AVAILABLE" + "|" + "NODE SELECTOR" + "|" + "AGE" + "\n"}
 				for i := 0; i < len(items); i++ {
 					now := time.Now().UTC()
@@ -1035,8 +1059,28 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					availableS := fmt.Sprintf("%v", available)
 
 					// To be enhanced
-					nodeselector := y["spec"].(map[interface{}]interface{})["template"].(map[interface{}]interface{})["spec"].(map[interface{}]interface{})["nodeSelector"]
-					nodeselectorS := fmt.Sprintf("%v", nodeselector)
+					nodeselector := y["spec"].(map[interface{}]interface{})["template"].(map[interface{}]interface{})["spec"].(map[interface{}]interface{})["nodeSelector"].(map[interface{}]interface{})
+					// nodeselectorS := fmt.Sprintf("%v", nodeselector)
+					nodeselectorS := ""
+					count := len(nodeselector)
+					for key, value := range nodeselector {
+						if count > 1 {
+							if fmt.Sprintf("%v", value) != "" {
+								nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key) + ":" + fmt.Sprintf("%v", value) + ", "
+							} else {
+								nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key) + ", "
+							}
+
+							count--
+						} else {
+							if fmt.Sprintf("%v", value) != "" {
+								nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key) + ":" + fmt.Sprintf("%v", value)
+							} else {
+								nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key)
+							}
+						}
+
+					}
 
 					CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
 					CreationTimeS := fmt.Sprintf("%v", CreationTime)
@@ -1079,6 +1123,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			Output = []string{"NAME" + "|" + "TYPE" + "|" + "CLUSTER-IP" + "|" + "EXTERNAL-IP" + "|" + "PORT(S)" + "|" + "AGE" + "\n"}
 			yaml.Unmarshal([]byte(yfile), m)
 			if len(items) > 0 {
+				List4.SetTitle("Services")
 				for i := 0; i < len(items); i++ {
 					y := items[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
@@ -1159,6 +1204,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			yaml.Unmarshal([]byte(yfile), m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
+				List4.SetTitle("Routes")
 				for i := 0; i < len(items); i++ {
 					y := items[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
@@ -1229,6 +1275,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			yaml.Unmarshal([]byte(yfile), m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
+				List4.SetTitle("Image Streams")
 				for i := 0; i < len(items); i++ {
 					y := items[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
@@ -1288,6 +1335,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			yaml.Unmarshal([]byte(yfile), m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
+				List4.SetTitle("PVCs")
 				for i := 0; i < len(items); i++ {
 					y := items[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
@@ -1351,6 +1399,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			yaml.Unmarshal([]byte(yfile), m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
+				List4.SetTitle("ConfigMaps")
 				for i := 0; i < len(items); i++ {
 					y := items[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
@@ -1407,6 +1456,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			yaml.Unmarshal([]byte(yfile), m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
+				List4.SetTitle("Secrets")
 				for i := 0; i < len(items); i++ {
 					y := items[i].(map[interface{}]interface{})
 					name := y["metadata"].(map[interface{}]interface{})["name"]
@@ -1458,6 +1508,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			Output := []string{"NAME" + "|" + "PACKAGE" + "|" + "SOURCE" + "|" + "CHANNEL" + "\n"}
 			files, _ := ioutil.ReadDir(BasePath + "namespaces/" + List2Item + "/operators.coreos.com/subscriptions/")
 			for _, file := range files {
+				List4.SetTitle("Subscriptions")
 				yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/operators.coreos.com/subscriptions/" + file.Name())
 				m := make(map[string]interface{})
 				yaml.Unmarshal([]byte(yfile), m)
@@ -1486,6 +1537,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			// Cleaning TextView and TextViewData
 			TextView.Clear()
 			TextViewData = ""
+			List4.SetTitle("Operators")
 			Output := []string{"NAME" + "|" + "DISPLAY" + "|" + "VERSION" + "|" + "REPLACES" + "|" + "PHASE" + "\n"}
 			files, _ := ioutil.ReadDir(BasePath + "namespaces/" + List2Item + "/operators.coreos.com/clusterserviceversions/")
 			for _, file := range files {

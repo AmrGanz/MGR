@@ -329,5 +329,4 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = FormatedOutput
 
 	}
-
 }

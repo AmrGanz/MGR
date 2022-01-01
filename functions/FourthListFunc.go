@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -54,6 +55,7 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 		} else if List3Item == "Pods" {
 			// Add pod's containers to the Fifth list
 			List5.Clear()
+			List5.SetTitle("Containers")
 			filesList, _ := ioutil.ReadDir(BasePath + "namespaces/" + List2Item + "/pods/" + List4Item)
 			if len(filesList) > 0 {
 				for _, file := range filesList {
@@ -125,16 +127,23 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 		m := make(map[string]interface{})
 		yaml.Unmarshal([]byte(yfile), m)
 
-		paths := m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["storage"].(map[interface{}]interface{})["files"].([]interface{})
-		for i := range paths {
-			path := fmt.Sprintf("%v", paths[i].(map[interface{}]interface{})["path"])
-			if path == List4Item {
-				constents := fmt.Sprintf("%v", paths[i].(map[interface{}]interface{})["contents"].(map[interface{}]interface{})["source"])
-				constents = strings.Trim(constents, "data:,")
-				constents, _ = url.QueryUnescape(constents)
-				TextView.SetText(constents)
+		// files is mc.spec.config.storage.files
+		files := m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["storage"].(map[interface{}]interface{})["files"].([]interface{})
+		for i := range files {
+			MCfilePath := fmt.Sprintf("%v", files[i].(map[interface{}]interface{})["path"])
+			if MCfilePath == List4Item {
+				contents := fmt.Sprintf("%v", files[i].(map[interface{}]interface{})["contents"].(map[interface{}]interface{})["source"])
+				if strings.Contains(contents, ";base64,") {
+					contents = strings.Split(contents, ";base64,")[1]
+					contentsBytes, _ := base64.StdEncoding.DecodeString(contents)
+					contents = string(contentsBytes)
+				} else {
+					contents = strings.TrimPrefix(contents, "data:,")
+					contents, _ = url.QueryUnescape(contents)
+				}
+				TextView.SetText(contents)
 				TextView.ScrollToBeginning()
-				TextViewData = constents
+				TextViewData = contents
 				break
 			}
 		}

@@ -13,6 +13,7 @@ var BasePath = "empty"
 var mark = 0
 
 // A funtion to check if the provided directory is a valid must-gather diretory
+// THIS SHOULD BE REMOVED AND JUST CHECK IF A RESOURCE FILE/DIRECTORY EXISTS ON THE GO
 func DirCheck() {
 	// Check if there is a provided argument
 	len := len(os.Args)
@@ -84,7 +85,7 @@ func DirPathTreeBuild() {
 
 func StartUI() {
 	// Call function CreateUI from functions/initialUI.go package to create the initial UI
-	// Sart the UI with the Root=MainGrid
+	// Start the UI with the Root=MainGrid
 	CreateUI()
 	App.SetInputCapture(KeyboardKeys).
 		SetRoot(MainGrid, true).
