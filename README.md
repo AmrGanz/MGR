@@ -36,17 +36,17 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 - Filter output text using the SearchBox
 - Copy from the output text using the CopyMode button
 - Ability to use the mouse
+- Read a MG that is generated from multiple images
+- Descrypt Secrets, and MachineConfigs
 
 # To be added Features "TBA":
-- Read a MG that is generated from multiple images
+
 - More cluster reources to be added
 - Color coding
 - Dynamically set the initial size of the interface areas according to the initial terminal size
 - Display and search containers full logs
 - Keyboard shourtcuts
-- Descrypt Secrets, and MachineConfigs
-- Some options will give an output as "TBA" which means that this option will be added later
-- ...
+- Some selections will give an output as "TBA" which means that this feature will be added later
 
 # Notes:
 - This tool is using [tview](https://github.com/rivo/tview) go library
