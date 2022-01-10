@@ -48,7 +48,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					if _, err := os.Stat(BasePath + "namespaces/" + fileInfo[projectIndex].Name() + "/core/pods.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + fileInfo[projectIndex].Name() + "/core/pods.yaml")
 						m := make(map[interface{}]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
 							// Loop between pods
@@ -116,7 +116,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/apps/deployments.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/apps/deployments.yaml")
 						m := make(map[interface{}]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
@@ -172,7 +172,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/apps.openshift.io/deploymentconfigs.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/apps.openshift.io/deploymentconfigs.yaml")
 						m := make(map[interface{}]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
 							Output = []string{"NAMESPACE" + "|" + "NAME" + "|" + "REVISION" + "|" + "DESIRED" + "|" + "CURRENT" + "|" + "TRIGGERED BY" + "|" + "Age" + "\n"}
@@ -246,7 +246,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/apps/daemonsets.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/apps/daemonsets.yaml")
 						m := make(map[string]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
@@ -336,7 +336,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/core/services.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/core/services.yaml")
 						m := make(map[interface{}]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
@@ -422,7 +422,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/route.openshift.io/routes.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/route.openshift.io/routes.yaml")
 						m := make(map[interface{}]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
@@ -499,7 +499,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/image.openshift.io/imagestreams.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/image.openshift.io/imagestreams.yaml")
 						m := make(map[interface{}]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
@@ -563,7 +563,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/core/persistentvolumeclaims.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/core/persistentvolumeclaims.yaml")
 						m := make(map[interface{}]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
@@ -630,7 +630,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/core/configmaps.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/core/configmaps.yaml")
 						m := make(map[interface{}]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
@@ -688,7 +688,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/core/secrets.yaml"); err == nil {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/core/secrets.yaml")
 						m := make(map[interface{}]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 						items, _ := m["items"].([]interface{})
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
@@ -749,7 +749,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					for _, file := range files {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/operators.coreos.com/subscriptions/" + file.Name())
 						m := make(map[string]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 
 						name := m["metadata"].(map[interface{}]interface{})["name"]
 						nameS := fmt.Sprintf("%v", name)
@@ -783,7 +783,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					for _, file := range files {
 						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/operators.coreos.com/clusterserviceversions/" + file.Name())
 						m := make(map[string]interface{})
-						yaml.Unmarshal([]byte(yfile), m)
+						yaml.Unmarshal(yfile, m)
 
 						name := m["metadata"].(map[interface{}]interface{})["name"]
 						nameS := fmt.Sprintf("%v", name)
@@ -831,7 +831,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			// This should be a table
 			yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/events.yaml")
 			m := make(map[interface{}]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
 				Output = []string{"Time" + "|" + "Type" + "|" + "Message" + "|" + "Reason" + "\n"}
@@ -870,7 +870,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			if _, err := os.Stat(BasePath + "namespaces/" + List2Item + "/core/pods.yaml"); err == nil {
 				yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/pods.yaml")
 				m := make(map[interface{}]interface{})
-				yaml.Unmarshal([]byte(yfile), m)
+				yaml.Unmarshal(yfile, m)
 				items, _ := m["items"].([]interface{})
 				now := time.Now().UTC()
 				if len(items) > 0 {
@@ -932,7 +932,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			// Get projects deployments "if exists"
 			yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/apps/deployments.yaml")
 			m := make(map[interface{}]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
 				List4.SetTitle("Deployments")
@@ -984,7 +984,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			// Get projects deployments "if exists"
 			yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/apps.openshift.io/deploymentconfigs.yaml")
 			m := make(map[interface{}]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
 				List4.SetTitle("DeploymentConfig")
@@ -1031,7 +1031,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			// Get projects daemonsets "if exists"
 			yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/apps/daemonsets.yaml")
 			m := make(map[interface{}]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
 				List4.SetTitle("Daemonsets")
@@ -1118,10 +1118,10 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			now := time.Now().UTC()
 			yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/services.yaml")
 			m := make(map[interface{}]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			items, _ := m["items"].([]interface{})
 			Output = []string{"NAME" + "|" + "TYPE" + "|" + "CLUSTER-IP" + "|" + "EXTERNAL-IP" + "|" + "PORT(S)" + "|" + "AGE" + "\n"}
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			if len(items) > 0 {
 				List4.SetTitle("Services")
 				for i := 0; i < len(items); i++ {
@@ -1201,7 +1201,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			Output = []string{"NAME" + "|" + "HOST/PORT" + "|" + "PATH" + "|" + "SERVICES" + "|" + "PORT" + "|" + "TERMINATION" + "|" + "WILDCARD" + "|" + "AGE" + "\n"}
 			yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/route.openshift.io/routes.yaml")
 			m := make(map[interface{}]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
 				List4.SetTitle("Routes")
@@ -1272,7 +1272,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			Output = []string{"NAMESPACE" + "|" + "NAME" + "|" + "TAGS" + "|" + "AGE 	" + "\n"}
 			yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/image.openshift.io/imagestreams.yaml")
 			m := make(map[interface{}]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
 				List4.SetTitle("Image Streams")
@@ -1332,7 +1332,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			Output = []string{"NAME" + "|" + "STATUS" + "|" + "VOLUME 	" + "|" + "CAPACITY" + "|" + "ACCESS MODES" + "|" + "STORAGECLASS" + "|" + "AGE" + "\n"}
 			yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/persistentvolumeclaims.yaml")
 			m := make(map[interface{}]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
 				List4.SetTitle("PVCs")
@@ -1396,7 +1396,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			Output := []string{"NAME" + "|" + "DATA" + "|" + "AGE" + "\n"}
 			yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/configmaps.yaml")
 			m := make(map[interface{}]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
 				List4.SetTitle("ConfigMaps")
@@ -1453,7 +1453,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			Output := []string{"NAME" + "|" + "TYPE" + "|" + "DATA" + "|" + "AGE" + "\n"}
 			yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/secrets.yaml")
 			m := make(map[interface{}]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 			items, _ := m["items"].([]interface{})
 			if len(items) > 0 {
 				List4.SetTitle("Secrets")
@@ -1511,7 +1511,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 				List4.SetTitle("Subscriptions")
 				yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/operators.coreos.com/subscriptions/" + file.Name())
 				m := make(map[string]interface{})
-				yaml.Unmarshal([]byte(yfile), m)
+				yaml.Unmarshal(yfile, m)
 
 				name := m["metadata"].(map[interface{}]interface{})["name"]
 				nameS := fmt.Sprintf("%v", name)
@@ -1543,7 +1543,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			for _, file := range files {
 				yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/operators.coreos.com/clusterserviceversions/" + file.Name())
 				m := make(map[string]interface{})
-				yaml.Unmarshal([]byte(yfile), m)
+				yaml.Unmarshal(yfile, m)
 
 				name := m["metadata"].(map[interface{}]interface{})["name"]
 				nameS := fmt.Sprintf("%v", name)
@@ -1584,10 +1584,10 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 
 		// Print a summerized nodes status
 		now := time.Now().UTC()
-		Output := []string{"NAME" + "|" + "STATUS" + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSION" + "\n"}
+		Output := []string{"NAME" + "|" + "STATUS" + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSIONNN" + "\n"}
 		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + List2Item + ".yaml")
 		m := make(map[string]interface{})
-		yaml.Unmarshal([]byte(yfile), m)
+		yaml.Unmarshal(yfile, m)
 
 		name := m["metadata"].(map[interface{}]interface{})["name"]
 		nameS := fmt.Sprintf("%v", name)
@@ -1739,7 +1739,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + List2Item + ".yaml")
 
 		m := make(map[string]interface{})
-		yaml.Unmarshal([]byte(yfile), m)
+		yaml.Unmarshal(yfile, m)
 
 		name := m["metadata"].(map[interface{}]interface{})["name"]
 		nameS := fmt.Sprintf("%v", name)
@@ -1824,7 +1824,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + List2Item + ".yaml")
 
 		m := make(map[string]interface{})
-		yaml.Unmarshal([]byte(yfile), m)
+		yaml.Unmarshal(yfile, m)
 
 		name := m["metadata"].(map[interface{}]interface{})["name"]
 		nameS := fmt.Sprintf("%v", name)
@@ -1875,7 +1875,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + List2Item + ".yaml")
 
 		m := make(map[string]interface{})
-		yaml.Unmarshal([]byte(yfile), m)
+		yaml.Unmarshal(yfile, m)
 
 		if m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["storage"] != nil {
 			paths := m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["storage"].(map[interface{}]interface{})["files"].([]interface{})
@@ -1895,7 +1895,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/persistentvolumes/" + List2Item + ".yaml")
 
 		m := make(map[string]interface{})
-		yaml.Unmarshal([]byte(yfile), m)
+		yaml.Unmarshal(yfile, m)
 
 		name := m["metadata"].(map[interface{}]interface{})["name"]
 		nameS := fmt.Sprintf("%v", name)

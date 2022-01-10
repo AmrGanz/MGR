@@ -60,7 +60,8 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 	} else if list_item_name == "Operators" {
 		List2.SetTitle("Operators")
 		clusteroperators, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
-		Output := []string{"NAME" + "|" + "VERSION" + "|" + "AVAILABLE" + "|" + "PROGRESSINS" + "|" + "DEGRADED" + "|" + "SINCE" + "\n"}
+		Output := []string{"NAME" + "|" + "VERSION" + "|" + "AVAILABLE" + "|" + "PROGRESSINS" + "|" + "DEGRADED" + "|" + "SINCE"}
+
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal([]byte(clusteroperators), m)
 		items, _ := m["items"].([]interface{})
@@ -125,8 +126,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 				}
 
 			}
-			// fmt.Print(nameS + "\t" + versionS + "\t" + availableS + "\t" + progressingS + "\t" + degradedS + "\t" + availableSince + "\n")
-			Output = append(Output, nameS+"|"+versionS+"|"+availableS+"|"+progressingS+"|"+degradedS+"|"+availableSince+"\n")
+			Output = append(Output, nameS+"|"+versionS+"|"+availableS+"|"+progressingS+"|"+degradedS+"|"+availableSince)
 		}
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)
@@ -144,7 +144,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 			yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + mcp.Name())
 
 			m := make(map[string]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 
 			name := m["metadata"].(map[interface{}]interface{})["name"]
 			nameS := fmt.Sprintf("%v", name)
@@ -229,7 +229,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 			yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + file.Name())
 
 			m := make(map[string]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 
 			name := m["metadata"].(map[interface{}]interface{})["name"]
 			nameS := fmt.Sprintf("%v", name)
@@ -278,7 +278,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 			yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/persistentvolumes/" + file.Name())
 
 			m := make(map[string]interface{})
-			yaml.Unmarshal([]byte(yfile), m)
+			yaml.Unmarshal(yfile, m)
 
 			name := m["metadata"].(map[interface{}]interface{})["name"]
 			nameS := fmt.Sprintf("%v", name)

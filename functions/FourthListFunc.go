@@ -21,33 +21,9 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 	List6.SetTitle("")
 	List4Item = list_item_name
 	ActivePathBox.SetText(List1Item + " -> " + List2Item + " -> " + List3Item + " -> " + List4Item)
-	if List1Item == "Projects" && List2Item == "All Projects" {
+	if List1Item == "Projects" && List2Item != "All Projects" {
 		if List3Item == "Summary" {
-
-		} else if List3Item == "Pods" {
-			// Table of Projects/Pods
-		} else if List3Item == "Deployment" {
-			// Table of Projects/Deployment
-		} else if List3Item == "DeploymentConfig" {
-			// Table of Projects/DeploymentConfig
-		} else if List3Item == "Daemonset" {
-			// Table of Projects/Daemonset
-		} else if List3Item == "Services" {
-			// Table of Projects/Services
-		} else if List3Item == "Routes" {
-			// Table of Projects/Routes
-		} else if List3Item == "Image Stream" {
-			// Table of Projects/Image Stream
-		} else if List3Item == "PVC" {
-			// Table of Projects/PVC
-		} else if List3Item == "ConfigMap" {
-			// Table of Projects/ConfigMap
-		} else if List3Item == "Secrets" {
-			// Table of Projects/Secrets
-		}
-	} else if List1Item == "Projects" && List2Item != "All Projects" {
-		if List3Item == "Summary" {
-
+			// Show summary
 		} else if List3Item == "YAML" {
 			// Table of Projects/YAML
 		} else if List3Item == "Events" {
@@ -125,7 +101,7 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + List2Item + ".yaml")
 
 		m := make(map[string]interface{})
-		yaml.Unmarshal([]byte(yfile), m)
+		yaml.Unmarshal(yfile, m)
 
 		// files is mc.spec.config.storage.files
 		files := m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["storage"].(map[interface{}]interface{})["files"].([]interface{})

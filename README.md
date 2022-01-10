@@ -10,6 +10,8 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 ~~~
 # git clone https://github.com/AmrGanz/MGR.git
 # cd MGR
+# go mod init mgr
+# go mod tidy
 # go build . -o mgr
 # ./mgr <MG path>
 ~~~

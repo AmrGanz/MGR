@@ -48,6 +48,8 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 				AddItem("Secrets", "", 0, nil).
 				AddItem("Subscriptions", "", 0, nil).
 				AddItem("Operators", "", 0, nil)
+		} else if List2Item == "Empty" {
+			// Do nothing
 		} else {
 			List3.
 				// AddItem("Summary", "", 0, nil).
@@ -79,7 +81,7 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 			for _, file := range files {
 				yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + file.Name())
 				m := make(map[string]interface{})
-				yaml.Unmarshal([]byte(yfile), m)
+				yaml.Unmarshal(yfile, m)
 
 				name := m["metadata"].(map[interface{}]interface{})["name"]
 				nameS := fmt.Sprintf("%v", name)
@@ -150,7 +152,7 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 			for _, file := range files {
 				yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + file.Name())
 				m := make(map[string]interface{})
-				yaml.Unmarshal([]byte(yfile), m)
+				yaml.Unmarshal(yfile, m)
 				name := m["metadata"].(map[interface{}]interface{})["name"]
 				nameS := fmt.Sprintf("%v", name)
 

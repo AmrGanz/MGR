@@ -3,11 +3,9 @@
 package main
 
 import (
-	myfuncs "tview/functions"
+	myfuncs "mgr/functions"
 )
 
 func main() {
-
-	myfuncs.DirCheck()
-
+	myfuncs.GetMGFiles()
 }

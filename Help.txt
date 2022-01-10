@@ -1,0 +1,12 @@
+This tool will help you navigate a must-gather directory and quickly get information bout the cluster.
+
+You should run it while providing a correct must-gather directory as the first argument, for example:
+[green]
+mgr.alpha ../a/b/c/must-gather.local.8085715301419572185/
+[white]
+You will then start by choosing the must-gather type from the drop-down menu [Select a must-gather type], for example, choose of the options you see in the drop-down menu:
+[green]
+quay-io-openshift-release-dev-ocp-v4-0-art-dev-sha256-xxxxx
+registry-redhat-io-container-native-virtualization-cnv-must-gather-rhel8-sha256-xxxxx
+registry-redhat-io-openshift4-ose-cluster-logging-operator-sha256-xxxxx
+[white]

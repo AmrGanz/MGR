@@ -3,50 +3,26 @@
 package functions
 
 import (
+	"io/ioutil"
 	"strings"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
-var App = tview.NewApplication()
-var MainGrid = tview.NewGrid()
-var SearchModeGrid = tview.NewGrid()
-var CopyModeGrid = tview.NewGrid()
-var ClusterInfoButton = tview.NewButton("Cluster Info")
-var ClusterStatusButton = tview.NewButton("Cluster Status")
-var HelpButton = tview.NewButton("Help")
-var FocusModeButton = tview.NewButton("Focus Window")
-var ExitButton = tview.NewButton("Exit")
-var SearchBox = tview.NewInputField()
-var CopyModeButton = tview.NewButton("Copy Mode")
-var SearchButton = tview.NewButton("Search")
-var GoBackButton = tview.NewButton("Go Back")
-var ActivePathBox = tview.NewTextView()
-var List1 = tview.NewList()
-var List2 = tview.NewList()
-var List3 = tview.NewList()
-var List4 = tview.NewList()
-var List5 = tview.NewList()
-var List6 = tview.NewList()
-var TextView = tview.NewTextView().SetDynamicColors(true)
-var MessageWindow = tview.NewModal()
-var List1Item string = ""
-var List2Item string = ""
-var List3Item string = ""
-var List4Item string = ""
-var List5Item string = ""
-var List6Item string = ""
-var TextViewData string = ""
-var SearchResult []string = []string{""}
-
-var height = 1
-var width = 15
-var rows []int = []int{height, 20, 10, 0, height}
-var columns []int = []int{width, width, width, width, 0, width, width, width}
+func OnHelp() {
+	Help, err := ioutil.ReadFile("Help.txt")
+	if err != nil {
+		TextView.SetText("No data in the Help file or I couldn't access it")
+	} else {
+		TextView.SetText(string(Help))
+	}
+}
 
 func OnSearch() {
 	searchitem := SearchBox.GetText()
+
+	SearchResult = []string{""}
 	if searchitem == "" {
 		TextView.SetText(TextViewData)
 		TextView.ScrollToBeginning()
@@ -64,7 +40,6 @@ func OnSearch() {
 		}
 		SearchResult = nil
 	}
-
 }
 
 func OnCopyMode() {
@@ -91,6 +66,9 @@ func OnGoBack() {
 
 func KeyboardKeys(event *tcell.EventKey) *tcell.EventKey {
 
+	if SearchBox.HasFocus() && event.Key() == tcell.KeyEnter {
+		OnSearch()
+	}
 	// if SearchBox.HasFocus() {
 	// 	return event
 	// } else {
@@ -119,9 +97,16 @@ func TextViewOnFocus(action tview.MouseAction, event *tcell.EventMouse) {
 	TextView.SetBackgroundColor(tcell.ColorLightGrey)
 }
 
-func CreateUI() {
+func SetPath() {
+	_, SelectedMGType := MGDropDown.GetCurrentOption()
+	BasePath = ProvidedDirPath + SelectedMGType + "/"
+}
 
-	// modifying the buttons
+func CreateUI() {
+	// Modifying MGDropDown's attributes
+	MGDropDown.SetLabel("Select a must-gather type:  ")
+
+	// Modifying buttons' attributes
 	ClusterInfoButton.SetBorder(false).SetBackgroundColor(tcell.ColorBlue)
 	ClusterStatusButton.SetBorder(false).SetBackgroundColor(tcell.ColorBlue)
 	FocusModeButton.SetBorder(false).SetBackgroundColor(tcell.ColorOrangeRed)
@@ -136,15 +121,17 @@ func CreateUI() {
 	GoBackButton.SetBorder(false).SetBackgroundColor(tcell.ColorDarkRed)
 	GoBackButton.SetSelectedFunc(OnGoBack)
 
+	// Setting SearchBox attributes
+	SearchBox.SetInputCapture(KeyboardKeys)
+
 	// setting TextView attributes
 	TextView.SetDoneFunc(TextViewOnExit)
 	TextView.
 		SetDynamicColors(true).
-		SetRegions(true).
 		SetWordWrap(true)
 
-	// SearchBox attributes
-	// SearchBox.SetBackgroundColor()   <--- To make it transparent
+	// Setting SearchBox attributes
+	HelpButton.SetSelectedFunc(OnHelp)
 
 	// inittializing the List1 widget with common attributes
 	List1.
@@ -208,7 +195,8 @@ func CreateUI() {
 		SetBorders(true).
 		// AddItem(ClusterInfoButton, 0, 0, 1, 1, 0, 0, false).
 		// AddItem(ClusterStatusButton, 0, 1, 1, 1, 0, 0, false).
-		AddItem(ActivePathBox, 0, 0, 1, 5, 0, 0, false).
+		AddItem(MGDropDown, 0, 0, 1, 4, 0, 0, false).
+		AddItem(ActivePathBox, 0, 4, 1, 1, 0, 0, false).
 		AddItem(HelpButton, 0, 5, 1, 1, 0, 0, false).
 		AddItem(CopyModeButton, 0, 6, 1, 1, 0, 0, false).
 		AddItem(ExitButton, 0, 7, 1, 1, 0, 0, false).
