@@ -22,13 +22,7 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 	List4Item = list_item_name
 	ActivePathBox.SetText(List1Item + " -> " + List2Item + " -> " + List3Item + " -> " + List4Item)
 	if List1Item == "Projects" && List2Item != "All Projects" {
-		if List3Item == "Summary" {
-			// Show summary
-		} else if List3Item == "YAML" {
-			// Table of Projects/YAML
-		} else if List3Item == "Events" {
-			// Table of Projects/Events
-		} else if List3Item == "Pods" {
+		if List3Item == "Pods" {
 			// Add pod's containers to the Fifth list
 			List5.Clear()
 			List5.SetTitle("Containers")
@@ -93,6 +87,20 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 			List6.
 				AddItem("Info", "", 0, nil).
 				AddItem("YAML", "", 0, nil)
+		} else if List3Item == "Subscriptions" {
+			// Cleaning TextView and TextViewData
+			TextView.Clear()
+			TextViewData = ""
+			file, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/operators.coreos.com/subscriptions/" + List4Item + ".yaml")
+
+			TextView.SetText(string(file))
+			TextView.ScrollToBeginning()
+			TextViewData = FormatedOutput
+		} else if List3Item == "Operators" {
+			YamlFile, Err = ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/operators.coreos.com/clusterserviceversions/" + List4Item + ".yaml")
+			TextView.SetText(string(YamlFile))
+			TextViewData = TextView.GetText(false)
+			TextView.ScrollToBeginning()
 		}
 	} else if List1Item == "MC" && List3Item == "Data" {
 		TextView.Clear()

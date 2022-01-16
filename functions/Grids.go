@@ -140,6 +140,7 @@ func CreateUI() {
 	List1.SetHighlightFullLine(true)
 	List1.
 		ShowSecondaryText(false).
+		AddItem("Configurations", "", 0, nil).
 		AddItem("Projects", "", 0, nil).
 		AddItem("Nodes", "", 0, nil).
 		AddItem("Operators", "", 0, nil).

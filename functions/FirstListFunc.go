@@ -31,7 +31,16 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 
 	// Adding selection path to the ActivePathBox
 	ActivePathBox.SetText(List1Item + " -> ")
-	if list_item_name == "Projects" {
+	if list_item_name == "Configurations" {
+		List2.SetTitle("Cluster Configurations")
+		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/config.openshift.io/")
+		for i := range files {
+			if !files[i].IsDir() {
+				List2.AddItem(strings.Split(files[i].Name(), ".yaml")[0], "", 0, nil)
+			}
+		}
+
+	} else if list_item_name == "Projects" {
 		List2.SetTitle("Projects")
 		namespaces, _ := ioutil.ReadDir(BasePath + "namespaces/")
 		if len(namespaces) > 0 {
@@ -60,7 +69,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 	} else if list_item_name == "Operators" {
 		List2.SetTitle("Operators")
 		clusteroperators, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
-		Output := []string{"NAME" + "|" + "VERSION" + "|" + "AVAILABLE" + "|" + "PROGRESSINS" + "|" + "DEGRADED" + "|" + "SINCE"}
+		Output := []string{Colors.Yellow + "NAME" + "|" + "VERSION" + "|" + "AVAILABLE" + "|" + "PROGRESSINS" + "|" + "DEGRADED" + "|" + "SINCE" + Colors.White}
 
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal([]byte(clusteroperators), m)
@@ -126,7 +135,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 				}
 
 			}
-			Output = append(Output, nameS+"|"+versionS+"|"+availableS+"|"+progressingS+"|"+degradedS+"|"+availableSince)
+			Output = append(Output, Colors.White+nameS+"|"+versionS+"|"+availableS+"|"+progressingS+"|"+degradedS+"|"+availableSince+Colors.White)
 		}
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)
@@ -137,7 +146,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
-		Output := []string{"NAME" + "|" + "CONFIG" + "|" + "UPDATED" + "|" + "UPDATING" + "|" + "DEGRADED" + "|" + "MACHINECOUNT" + "|" + "READYMACHINECOUNT" + "|" + "UPDATEDMACHINECOUNT" + "|" + "DEGRADEDMACHINECOUNT" + "|" + "AGE" + "\n"}
+		Output := []string{Colors.Yellow + "NAME" + "|" + "CONFIG" + "|" + "UPDATED" + "|" + "UPDATING" + "|" + "DEGRADED" + "|" + "MACHINECOUNT" + "|" + "READYMACHINECOUNT" + "|" + "UPDATEDMACHINECOUNT" + "|" + "DEGRADEDMACHINECOUNT" + "|" + "AGE" + Colors.White}
 
 		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/")
 		for _, mcp := range files {
@@ -210,7 +219,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 			} else if hours == "0" {
 				age = minutes + "m" + seconds + "s"
 			}
-			Output = append(Output, nameS+"|"+configS+"|"+updatedS+"|"+updatingS+"|"+degradedS+"|"+machineCountS+"|"+machineReadyS+"|"+machineUpdatedS+"|"+machineDegradedS+"|"+age+"\n")
+			Output = append(Output, Colors.White+nameS+"|"+configS+"|"+updatedS+"|"+updatingS+"|"+degradedS+"|"+machineCountS+"|"+machineReadyS+"|"+machineUpdatedS+"|"+machineDegradedS+"|"+age+Colors.White)
 		}
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)
@@ -223,7 +232,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.Clear()
 		TextViewData = ""
 		now := time.Now().UTC()
-		Output := []string{"NAME" + "|" + "GENERATEDBYCONTROLLER" + "|" + "IGNITIONVERSION" + "|" + "AGE" + "\n"}
+		Output := []string{Colors.Yellow + "NAME" + "|" + "GENERATEDBYCONTROLLER" + "|" + "IGNITIONVERSION" + "|" + "AGE" + Colors.White + "\n"}
 		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/")
 		for _, file := range files {
 			yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + file.Name())
@@ -236,7 +245,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 			List2.AddItem(nameS, "", 0, nil)
 
 			// TBA
-			// ganaratedBy := m["metadata"].(map[interface{}]interface{})["annotations"]
+			// ganaratedBy := m["metadata"].(map[interface{}]interface{})["annotations"].(map[interface{}]interface{})["machineconfiguration.openshift.io/generated-by-controller-version"]
 			// generatedByS := fmt.Sprintf("%v", ganaratedBy)
 			generatedByS := "TBA"
 
@@ -260,7 +269,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 			} else if hours == "0" {
 				age = minutes + "m" + seconds + "s"
 			}
-			Output = append(Output, nameS+"|"+generatedByS+"|"+ignitionVersionS+"|"+age+"\n")
+			Output = append(Output, Colors.White+nameS+"|"+generatedByS+"|"+ignitionVersionS+"|"+age+Colors.White+"\n")
 		}
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)
@@ -272,7 +281,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.Clear()
 		TextViewData = ""
 		now := time.Now().UTC()
-		Output := []string{"NAME" + "|" + "CAPACITY" + "|" + "ACCESS MODE" + "|" + "RECLAIM POLICY" + "|" + "STATUS" + "|" + "CLAIM" + "|" + "STORAGECLASS" + "|" + "AGE" + "\n"}
+		Output := []string{Colors.Yellow + "NAME" + "|" + "CAPACITY" + "|" + "ACCESS MODE" + "|" + "RECLAIM POLICY" + "|" + "STATUS" + "|" + "CLAIM" + "|" + "STORAGECLASS" + "|" + "AGE" + Colors.White}
 		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/core/persistentvolumes/")
 		for _, file := range files {
 			yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/persistentvolumes/" + file.Name())
@@ -321,7 +330,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 				age = minutes + "m" + seconds + "s"
 			}
 
-			Output = append(Output, nameS+"|"+capacityS+"|"+accessS+"|"+reclaimS+"|"+statusS+"|"+claimS+"|"+storageclassS+"|"+age+"\n")
+			Output = append(Output, Colors.White+nameS+"|"+capacityS+"|"+accessS+"|"+reclaimS+"|"+statusS+"|"+claimS+"|"+storageclassS+"|"+age+Colors.White)
 		}
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)

@@ -2,11 +2,11 @@
 MGR "_not the final name_" is a simple TUI interface to navigate and view OpenShift 4 must-gather files.
 
 # How to run it:
-- Download and run the executable file "mgr":
+- Download and run the executable file "mgr-v0.1":
 ~~~
-# ./mgr <MG path>
+# ./mgr-v0.1 <MG path>
 ~~~
-- Or, you can clone the project and build your own executable files as follows [Recommended]:
+- Or, you can clone the project and build your own executable file as follows [Recommended]:
 ~~~
 # git clone https://github.com/AmrGanz/MGR.git
 # cd MGR
@@ -38,6 +38,8 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 - Ability to use the mouse
 - Read a MG that is generated from multiple images
 - Descrypt Secrets, and MachineConfigs
+- Color coding is now working with some options
+- Show cluster's configurations [Proxy, Oauth, ...]
 
 # To be added Features "TBA":
 

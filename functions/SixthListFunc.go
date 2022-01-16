@@ -79,7 +79,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		for i := range x {
 			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
 				yaml, _ := yaml.Marshal(x[i])
-				TextView.SetText(fmt.Sprintf(string(yaml)))
+				TextView.SetText(string(yaml))
 			}
 		}
 		TextView.ScrollToBeginning()
@@ -140,7 +140,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		for i := range x {
 			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
 				yaml, _ := yaml.Marshal(x[i])
-				TextView.SetText(fmt.Sprintf(string(yaml)))
+				TextView.SetText(string(yaml))
 			}
 		}
 		TextView.ScrollToBeginning()
@@ -214,7 +214,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		for i := range x {
 			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
 				yaml, _ := yaml.Marshal(x[i])
-				TextView.SetText(fmt.Sprintf(string(yaml)))
+				TextView.SetText(string(yaml))
 			}
 		}
 		TextView.ScrollToBeginning()
@@ -306,7 +306,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		for i := range x {
 			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
 				yaml, _ := yaml.Marshal(x[i])
-				TextView.SetText(fmt.Sprintf(string(yaml)))
+				TextView.SetText(string(yaml))
 			}
 		}
 		TextView.ScrollToBeginning()
@@ -389,7 +389,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		for i := range x {
 			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
 				yaml, _ := yaml.Marshal(x[i])
-				TextView.SetText(fmt.Sprintf(string(yaml)))
+				TextView.SetText(string(yaml))
 			}
 		}
 		TextView.ScrollToBeginning()
@@ -460,7 +460,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		for i := range x {
 			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
 				yaml, _ := yaml.Marshal(x[i])
-				TextView.SetText(fmt.Sprintf(string(yaml)))
+				TextView.SetText(string(yaml))
 			}
 		}
 		TextView.ScrollToBeginning()
@@ -540,7 +540,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		for i := range x {
 			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
 				yaml, _ := yaml.Marshal(x[i])
-				TextView.SetText(fmt.Sprintf(string(yaml)))
+				TextView.SetText(string(yaml))
 			}
 		}
 		TextView.ScrollToBeginning()
@@ -607,7 +607,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		for i := range x {
 			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
 				yaml, _ := yaml.Marshal(x[i])
-				TextView.SetText(fmt.Sprintf(string(yaml)))
+				TextView.SetText(string(yaml))
 			}
 		}
 		TextView.ScrollToBeginning()
@@ -679,12 +679,12 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		for i := range x {
 			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
 				yaml, _ := yaml.Marshal(x[i])
-				TextView.SetText(fmt.Sprintf(string(yaml)))
+				TextView.SetText(string(yaml))
 			}
 		}
 		TextView.ScrollToBeginning()
 	} else if List1Item == "Projects" && List3Item == "Subscriptions" && List6Item == "Info" {
-
+		//TBA
 	} else if List1Item == "Projects" && List3Item == "Supscriptions" && List6Item == "YAML" {
 		// yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/apps/deployments.yaml")
 		// m := make(map[interface{}]interface{})
@@ -713,5 +713,40 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		// }
 		TextView.SetText("TBA")
 		TextView.ScrollToBeginning()
+	} else if List1Item == "Nodes" && List3Item == "YAML" {
+		if List6Item == "Metadata" {
+			Metadta, _ := yaml.Marshal(MyNode.Metadata)
+			MetadtaS := Colors.Orange + "Metadta:\n" + Colors.White + string(Metadta)
+			TextView.Clear()
+			TextView.SetText(MetadtaS)
+			TextView.ScrollToBeginning()
+		} else if List6Item == "Spec" {
+			Spec, _ := yaml.Marshal(MyNode.Spec)
+			SpecS := Colors.Orange + "Spec:\n" + Colors.White + string(Spec)
+			TextView.Clear()
+			TextView.SetText(SpecS)
+			TextView.ScrollToBeginning()
+		} else if List6Item == "Status" {
+			Status, _ := yaml.Marshal(MyNode.Status)
+			StatusS := Colors.Orange + "Status:\n" + Colors.White + string(Status)
+			TextView.Clear()
+			TextView.SetText(StatusS)
+			TextView.ScrollToBeginning()
+		} else if List6Item == "HW Spec" {
+			HWSpec := ""
+			Addresses, _ := yaml.Marshal(MyNode.Status.Addresses)
+			Allocatable, _ := yaml.Marshal(MyNode.Status.Allocatable)
+			Capacity, _ := yaml.Marshal(MyNode.Status.Capacity)
+			HWSpec += Colors.Orange + "Addresses:\n" + Colors.White + string(Addresses) + Colors.Orange + "Allocatable:\n" + Colors.White + string(Allocatable) + Colors.Orange + "Capacity:\n" + Colors.White + string(Capacity)
+			TextView.Clear()
+			TextView.SetText(HWSpec)
+			TextView.ScrollToBeginning()
+		} else if List6Item == "Images" {
+			Images, _ := yaml.Marshal(MyNode.Status.Images)
+			ImagesS := Colors.Orange + "Images:\n" + Colors.White + string(Images)
+			TextView.Clear()
+			TextView.SetText(ImagesS)
+			TextView.ScrollToBeginning()
+		}
 	}
 }
