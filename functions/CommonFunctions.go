@@ -48,9 +48,11 @@ func GetNodesInfo(NodeName string, Flag string) {
 }
 
 func ReadNodeYaml(NodeFileName string, Flag string) {
+	var MyNode = Node{}
 	now := time.Now().UTC()
-	yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + NodeFileName)
-	yaml.Unmarshal(yfile, &MyNode)
+	File, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + NodeFileName)
+
+	yaml.Unmarshal(File, &MyNode)
 
 	name := MyNode.Metadata.Name
 
@@ -76,7 +78,7 @@ func ReadNodeYaml(NodeFileName string, Flag string) {
 	}
 	roles := ""
 	Labels := MyNode.Metadata.Labels
-	for key, _ := range Labels {
+	for key := range Labels {
 		if strings.Contains(key, "node-role.kubernetes.io") {
 			roles += strings.Split(key, "/")[1] + " "
 		}

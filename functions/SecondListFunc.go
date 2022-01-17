@@ -3,6 +3,11 @@ package functions
 import (
 	"fmt"
 	"io/ioutil"
+	"strconv"
+	"time"
+
+	"github.com/ryanuber/columnize"
+	"gopkg.in/yaml.v2"
 )
 
 func SecondListOnSelect(index int, list_item_name string, second string, run rune) {
@@ -101,5 +106,62 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 		List3.
 			AddItem("Info", "", 0, nil).
 			AddItem("YAML", "", 0, nil)
+	} else if List1Item == "CSR" {
+		if List2Item == "All Certificate Signing Requests" {
+			now := time.Now().UTC()
+			Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
+			Output := []string{Colors.Yellow + "NAME" + "|" + "AGE" + "|" + "SIGNERNAME" + "|" + "REQUESTOR" + "|" + "CONDITION" + Colors.White}
+			if len(Files) == 0 {
+				TextView.SetText("No available data about CSR")
+			} else {
+				for _, File := range Files {
+					var MyCSR = CSR{}
+					yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/" + File.Name())
+					yaml.Unmarshal(yfile, &MyCSR)
+
+					name := MyCSR.Metadata.Name
+
+					// Not accurate yet!!!
+					CreationTime := MyCSR.Metadata.CreationTimestamp
+					CreationTimeS := fmt.Sprintf("%v", CreationTime)
+					t1, _ := time.Parse(time.RFC3339, CreationTimeS)
+					diff := now.Sub(t1).Seconds()
+					diffI := int(diff)
+					seconds := strconv.Itoa((diffI % 60))
+					minutes := strconv.Itoa((diffI / 60) % 60)
+					hours := strconv.Itoa((diffI / 360) % 24)
+					days := strconv.Itoa((diffI / 86400))
+					age := ""
+					if days != "0" {
+						age = days + "d" + hours + "h"
+					} else if days == "0" && hours != "" {
+						age = hours + "h" + minutes + "m"
+					} else if hours == "0" {
+						age = minutes + "m" + seconds + "s"
+					}
+
+					signature := MyCSR.Spec.SignerName
+					requester := MyCSR.Spec.Username
+					condition := ""
+
+					if MyCSR.Status.Certificate == "" {
+						condition = Colors.Red + "Pending" + Colors.White
+					} else {
+						condition = Colors.Green + "Approved,Issued" + Colors.White
+					}
+					Output = append(Output, Colors.White+name+"|"+age+"|"+signature+"|"+requester+"|"+condition+"|"+Colors.White)
+				}
+				FormatedOutput := columnize.SimpleFormat(Output)
+				TextView.SetText(FormatedOutput)
+				TextView.ScrollToBeginning()
+				TextViewData = FormatedOutput
+			}
+
+		} else {
+			File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/" + List2Item + ".yaml")
+			TextView.SetText(string(File))
+			TextView.ScrollToBeginning()
+			TextViewData = TextView.GetText(false)
+		}
 	}
 }

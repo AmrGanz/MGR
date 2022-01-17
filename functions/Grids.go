@@ -146,7 +146,8 @@ func CreateUI() {
 		AddItem("Operators", "", 0, nil).
 		AddItem("MCP", "", 0, nil).
 		AddItem("MC", "", 0, nil).
-		AddItem("PV", "", 0, nil)
+		AddItem("PV", "", 0, nil).
+		AddItem("CSR", "", 0, nil)
 	List1.SetSelectedFunc(FirstListOnSelect)
 	// inittializing the List4 widget with common attributes
 	List2.

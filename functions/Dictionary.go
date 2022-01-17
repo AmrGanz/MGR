@@ -51,7 +51,7 @@ var BasePath = "empty"
 var MyNode = Node{}
 var YamlFile []byte
 
-// Colors HEx codes:
+// Colors HEX codes:
 var Colors struct {
 	White  string
 	Yellow string
@@ -184,4 +184,74 @@ type MC struct {
 		KernelType      string      `yaml:"kernelType"`
 		OsImageURL      string      `yaml:"osImageURL"`
 	} `yaml:"spec"`
+}
+
+type CSR struct {
+	APIVersion string `yaml:"apiVersion"`
+	Kind       string `yaml:"kind"`
+	Metadata   struct {
+		CreationTimestamp time.Time `yaml:"creationTimestamp"`
+		GenerateName      string    `yaml:"generateName"`
+		Name              string    `yaml:"name"`
+		ResourceVersion   string    `yaml:"resourceVersion"`
+		SelfLink          string    `yaml:"selfLink"`
+		UID               string    `yaml:"uid"`
+	} `yaml:"metadata"`
+	Spec struct {
+		Groups     []string `yaml:"groups"`
+		Request    string   `yaml:"request"`
+		SignerName string   `yaml:"signerName"`
+		Usages     []string `yaml:"usages"`
+		Username   string   `yaml:"username"`
+	} `yaml:"spec"`
+	Status struct {
+		Certificate string `yaml:"certificate"`
+		Conditions  []struct {
+			LastTransitionTime time.Time `yaml:"lastTransitionTime"`
+			LastUpdateTime     time.Time `yaml:"lastUpdateTime"`
+			Message            string    `yaml:"message"`
+			Reason             string    `yaml:"reason"`
+			Status             string    `yaml:"status"`
+			Type               string    `yaml:"type"`
+		} `yaml:"conditions"`
+	} `yaml:"status"`
+}
+
+type OPERATOR struct {
+	APIVersion string `yaml:"apiVersion"`
+	Items      []struct {
+		APIVersion string `yaml:"apiVersion"`
+		Kind       string `yaml:"kind"`
+		Metadata   struct {
+			Annotations       map[string]string `yaml:"annotations"`
+			CreationTimestamp time.Time         `yaml:"creationTimestamp"`
+			Generation        int               `yaml:"generation"`
+			Name              string            `yaml:"name"`
+			ResourceVersion   string            `yaml:"resourceVersion"`
+			SelfLink          string            `yaml:"selfLink"`
+			UID               string            `yaml:"uid"`
+		} `yaml:"metadata"`
+		Spec struct {
+		} `yaml:"spec"`
+		Status struct {
+			Conditions []struct {
+				LastTransitionTime time.Time `yaml:"lastTransitionTime"`
+				Message            string    `yaml:"message"`
+				Reason             string    `yaml:"reason"`
+				Status             string    `yaml:"status"`
+				Type               string    `yaml:"type"`
+			} `yaml:"conditions"`
+			Extension      interface{} `yaml:"extension"`
+			RelatedObjects []struct {
+				Group     string `yaml:"group"`
+				Name      string `yaml:"name"`
+				Resource  string `yaml:"resource"`
+				Namespace string `yaml:"namespace,omitempty"`
+			} `yaml:"relatedObjects"`
+			Versions []struct {
+				Name    string `yaml:"name"`
+				Version string `yaml:"version"`
+			} `yaml:"versions"`
+		} `yaml:"status"`
+	} `yaml:"items"`
 }

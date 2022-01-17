@@ -40,6 +40,7 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 - Descrypt Secrets, and MachineConfigs
 - Color coding is now working with some options
 - Show cluster's configurations [Proxy, Oauth, ...]
+- Check CSR details "if it got collected by the must-gather command"
 
 # To be added Features "TBA":
 

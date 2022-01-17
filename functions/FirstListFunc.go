@@ -69,10 +69,10 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 	} else if list_item_name == "Operators" {
 		List2.SetTitle("Operators")
 		clusteroperators, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
-		Output := []string{Colors.Yellow + "NAME" + "|" + "VERSION" + "|" + "AVAILABLE" + "|" + "PROGRESSINS" + "|" + "DEGRADED" + "|" + "SINCE" + Colors.White}
+		Output := []string{Colors.Yellow + "NAME" + "|" + "VERSION" + "|" + "AVAILABLE" + "|" + "PROGRESSING" + "|" + "DEGRADED" + "|" + "SINCE" + Colors.White}
 
 		m := make(map[interface{}]interface{})
-		yaml.Unmarshal([]byte(clusteroperators), m)
+		yaml.Unmarshal(clusteroperators, m)
 		items, _ := m["items"].([]interface{})
 		for i := range items {
 			operator := items[i].(map[interface{}]interface{})
@@ -337,5 +337,15 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.ScrollToBeginning()
 		TextViewData = FormatedOutput
 
+	} else if list_item_name == "CSR" {
+		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
+		List2.SetTitle("CSR")
+		// Cleaning TextView and TextViewData
+		TextView.Clear()
+		TextViewData = ""
+		List2.AddItem("All Certificate Signing Requests", "", 0, nil)
+		for _, File := range Files {
+			List2.AddItem(strings.Split(File.Name(), ".yaml")[0], "", 0, nil)
+		}
 	}
 }
