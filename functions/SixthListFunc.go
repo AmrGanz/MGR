@@ -715,34 +715,34 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.ScrollToBeginning()
 	} else if List1Item == "Nodes" && List3Item == "YAML" {
 		if List6Item == "Metadata" {
-			Metadta, _ := yaml.Marshal(MyNode.Metadata)
+			Metadta, _ := yaml.Marshal(MyNode_Public.Metadata)
 			MetadtaS := Colors.Orange + "Metadta:\n" + Colors.White + string(Metadta)
 			TextView.Clear()
 			TextView.SetText(MetadtaS)
 			TextView.ScrollToBeginning()
 		} else if List6Item == "Spec" {
-			Spec, _ := yaml.Marshal(MyNode.Spec)
+			Spec, _ := yaml.Marshal(MyNode_Public.Spec)
 			SpecS := Colors.Orange + "Spec:\n" + Colors.White + string(Spec)
 			TextView.Clear()
 			TextView.SetText(SpecS)
 			TextView.ScrollToBeginning()
 		} else if List6Item == "Status" {
-			Status, _ := yaml.Marshal(MyNode.Status)
+			Status, _ := yaml.Marshal(MyNode_Public.Status)
 			StatusS := Colors.Orange + "Status:\n" + Colors.White + string(Status)
 			TextView.Clear()
 			TextView.SetText(StatusS)
 			TextView.ScrollToBeginning()
 		} else if List6Item == "HW Spec" {
 			HWSpec := ""
-			Addresses, _ := yaml.Marshal(MyNode.Status.Addresses)
-			Allocatable, _ := yaml.Marshal(MyNode.Status.Allocatable)
-			Capacity, _ := yaml.Marshal(MyNode.Status.Capacity)
+			Addresses, _ := yaml.Marshal(MyNode_Public.Status.Addresses)
+			Allocatable, _ := yaml.Marshal(MyNode_Public.Status.Allocatable)
+			Capacity, _ := yaml.Marshal(MyNode_Public.Status.Capacity)
 			HWSpec += Colors.Orange + "Addresses:\n" + Colors.White + string(Addresses) + Colors.Orange + "Allocatable:\n" + Colors.White + string(Allocatable) + Colors.Orange + "Capacity:\n" + Colors.White + string(Capacity)
 			TextView.Clear()
 			TextView.SetText(HWSpec)
 			TextView.ScrollToBeginning()
 		} else if List6Item == "Images" {
-			Images, _ := yaml.Marshal(MyNode.Status.Images)
+			Images, _ := yaml.Marshal(MyNode_Public.Status.Images)
 			ImagesS := Colors.Orange + "Images:\n" + Colors.White + string(Images)
 			TextView.Clear()
 			TextView.SetText(ImagesS)

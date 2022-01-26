@@ -27,7 +27,7 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 - To retrive the original content, clean the `SearchBox` then press on the `Search Button`
 
 # A screenshot of the main interface showing an example output:
-![Alt text](https://github.com/AmrGanz/MGR/blob/main/MainInterface.png?raw=true)
+![Alt text](https://github.com/AmrGanz/MGR/blob/main/MainInterface.jpeg?raw=true)
 
 # Added Features:
 - Read Projects, Operators, Nodes, MCP, MC, and PersistentVolume resources details.

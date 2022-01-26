@@ -14,5 +14,6 @@ func main() {
 	myfuncs.Colors.Blue = "[#1E90FF]"
 	myfuncs.Colors.Orange = "[#FFA500]"
 	myfuncs.Colors.Filler = "[#123456]"
+
 	myfuncs.GetMGFiles()
 }

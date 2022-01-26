@@ -31,7 +31,14 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 
 	// Adding selection path to the ActivePathBox
 	ActivePathBox.SetText(List1Item + " -> ")
-	if list_item_name == "Configurations" {
+	if list_item_name == "Summary" {
+		// Get cluster version
+		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
+		MyCV := CLUSTERVERSION{}
+		yaml.Unmarshal(File, &MyCV)
+		ClusterVersion := MyCV.Spec.DesiredUpdate.Version
+		TextView.SetText("Clusterversion is:  " + Colors.Blue + ClusterVersion + Colors.White)
+	} else if list_item_name == "Configurations" {
 		List2.SetTitle("Cluster Configurations")
 		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/config.openshift.io/")
 		for i := range files {
@@ -68,41 +75,49 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 
 	} else if list_item_name == "Operators" {
 		List2.SetTitle("Operators")
-		clusteroperators, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
-		Output := []string{Colors.Yellow + "NAME" + "|" + "VERSION" + "|" + "AVAILABLE" + "|" + "PROGRESSING" + "|" + "DEGRADED" + "|" + "SINCE" + Colors.White}
+		// Get cluster version
+		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
+		MyCV := CLUSTERVERSION{}
+		yaml.Unmarshal(File, &MyCV)
+		ClusterVersion := MyCV.Spec.DesiredUpdate.Version
 
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(clusteroperators, m)
-		items, _ := m["items"].([]interface{})
+		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
+		Output := []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "VERSION" + Colors.Yellow + "|" + Colors.Yellow + "AVAILABLE" + Colors.Yellow + "|" + Colors.Yellow + "PROGRESSING" + Colors.Yellow + "|" + Colors.Yellow + "DEGRADED" + Colors.Yellow + "|" + "SINCE" + Colors.White}
+		MyOperators := OPERATORS{}
+		// m := make(map[interface{}]interface{})
+		yaml.Unmarshal(File, &MyOperators)
+		items := MyOperators.Items
 		for i := range items {
-			operator := items[i].(map[interface{}]interface{})
-			name := operator["metadata"].(map[interface{}]interface{})["name"]
-			nameS := fmt.Sprintf("%v", name)
-			List2.AddItem(nameS, "", 0, nil)
+			name := items[i].Metadata.Name
+			List2.AddItem(name, "", 0, nil)
 
-			versions := operator["status"].(map[interface{}]interface{})["versions"].([]interface{})
-			versionS := ""
+			versions := items[i].Status.Versions
+			versionsS := ""
 			for i := range versions {
-				if versions[i].(map[interface{}]interface{})["name"] == "operator" {
-					version := versions[i].(map[interface{}]interface{})["version"]
-					versionS = fmt.Sprintf("%v", version)
+				if versions[i].Name == "operator" {
+					versionsS = versions[i].Version
+					if versionsS == ClusterVersion {
+						versionsS = Colors.White + versionsS + Colors.White
+					} else {
+						versionsS = Colors.Red + versionsS + Colors.White
+					}
 				}
 			}
-			status := operator["status"].(map[interface{}]interface{})["conditions"].([]interface{})
+			status := items[i].Status.Conditions
 			availableS := ""
 			progressingS := ""
 			degradedS := ""
 			availableSince := ""
 			for i := range status {
-				if status[i].(map[interface{}]interface{})["type"] == "Available" {
-					if status[i].(map[interface{}]interface{})["status"] == "True" {
-						availableS = "True"
+				if status[i].Type == "Available" {
+					if status[i].Status == "True" {
+						availableS = Colors.Green + "True" + Colors.White
 					} else {
-						availableS = "False"
+						availableS = Colors.Red + "False" + Colors.White
 					}
 
 					now := time.Now().UTC()
-					statusTime := status[i].(map[interface{}]interface{})["lastTransitionTime"]
+					statusTime := status[i].LastTransitionTime
 					statusTimeS := fmt.Sprintf("%v", statusTime)
 					t1, _ := time.Parse(time.RFC3339, statusTimeS)
 					diff := now.Sub(t1).Seconds()
@@ -120,22 +135,22 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 						availableSince = minutes + "m" + seconds + "s"
 					}
 
-				} else if status[i].(map[interface{}]interface{})["type"] == "Progressing" {
-					if status[i].(map[interface{}]interface{})["status"] == "True" {
-						progressingS = "True"
+				} else if status[i].Type == "Progressing" {
+					if status[i].Status == "True" {
+						progressingS = Colors.Red + "True" + Colors.White
 					} else {
-						progressingS = "False"
+						progressingS = Colors.Green + "False" + Colors.White
 					}
-				} else if status[i].(map[interface{}]interface{})["type"] == "Degraded" {
-					if status[i].(map[interface{}]interface{})["status"] == "True" {
-						degradedS = "True"
+				} else if status[i].Type == "Degraded" {
+					if status[i].Status == "True" {
+						degradedS = Colors.Red + "True" + Colors.White
 					} else {
-						degradedS = "False"
+						degradedS = Colors.Green + "False" + Colors.White
 					}
 				}
 
 			}
-			Output = append(Output, Colors.White+nameS+"|"+versionS+"|"+availableS+"|"+progressingS+"|"+degradedS+"|"+availableSince+Colors.White)
+			Output = append(Output, Colors.White+name+"|"+versionsS+"|"+availableS+"|"+progressingS+"|"+degradedS+"|"+availableSince+Colors.White)
 		}
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)
@@ -146,85 +161,8 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
-		Output := []string{Colors.Yellow + "NAME" + "|" + "CONFIG" + "|" + "UPDATED" + "|" + "UPDATING" + "|" + "DEGRADED" + "|" + "MACHINECOUNT" + "|" + "READYMACHINECOUNT" + "|" + "UPDATEDMACHINECOUNT" + "|" + "DEGRADEDMACHINECOUNT" + "|" + "AGE" + Colors.White}
-
-		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/")
-		for _, mcp := range files {
-			yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + mcp.Name())
-
-			m := make(map[string]interface{})
-			yaml.Unmarshal(yfile, m)
-
-			name := m["metadata"].(map[interface{}]interface{})["name"]
-			nameS := fmt.Sprintf("%v", name)
-			List2.AddItem(nameS, "", 0, nil)
-
-			config := m["status"].(map[interface{}]interface{})["configuration"].(map[interface{}]interface{})["name"]
-			configS := fmt.Sprintf("%v", config)
-
-			status := m["status"].(map[interface{}]interface{})["conditions"].([]interface{})
-			updatedS := ""
-			updatingS := ""
-			degradedS := ""
-			for i := range status {
-				if status[i].(map[interface{}]interface{})["type"] == "Updated" {
-					if status[i].(map[interface{}]interface{})["status"] == "True" {
-						updatedS = "True"
-					} else {
-						updatedS = "False"
-					}
-
-				} else if status[i].(map[interface{}]interface{})["type"] == "Updating" {
-					if status[i].(map[interface{}]interface{})["status"] == "True" {
-						updatingS = "True"
-					} else {
-						updatingS = "False"
-					}
-				} else if status[i].(map[interface{}]interface{})["type"] == "Degraded" {
-					if status[i].(map[interface{}]interface{})["status"] == "True" {
-						degradedS = "True"
-					} else {
-						degradedS = "False"
-					}
-				}
-
-			}
-			machineCount := m["status"].(map[interface{}]interface{})["machineCount"]
-			machineCountS := fmt.Sprintf("%v", machineCount)
-
-			machineReady := m["status"].(map[interface{}]interface{})["readyMachineCount"]
-			machineReadyS := fmt.Sprintf("%v", machineReady)
-
-			machineUpdated := m["status"].(map[interface{}]interface{})["updatedMachineCount"]
-			machineUpdatedS := fmt.Sprintf("%v", machineUpdated)
-
-			machineDegraded := m["status"].(map[interface{}]interface{})["degradedMachineCount"]
-			machineDegradedS := fmt.Sprintf("%v", machineDegraded)
-
-			now := time.Now().UTC()
-			CreationTime := m["metadata"].(map[interface{}]interface{})["creationTimestamp"]
-			CreationTimeS := fmt.Sprintf("%v", CreationTime)
-			t1, _ := time.Parse(time.RFC3339, CreationTimeS)
-			diff := now.Sub(t1).Seconds()
-			diffI := int(diff)
-			seconds := strconv.Itoa((diffI % 60))
-			minutes := strconv.Itoa((diffI / 60) % 60)
-			hours := strconv.Itoa((diffI / 360) % 24)
-			days := strconv.Itoa((diffI / 86400))
-			age := ""
-			if days != "0" {
-				age = days + "d" + hours + "h"
-			} else if days == "0" && hours != "" {
-				age = hours + "h" + minutes + "m"
-			} else if hours == "0" {
-				age = minutes + "m" + seconds + "s"
-			}
-			Output = append(Output, Colors.White+nameS+"|"+configS+"|"+updatedS+"|"+updatingS+"|"+degradedS+"|"+machineCountS+"|"+machineReadyS+"|"+machineUpdatedS+"|"+machineDegradedS+"|"+age+Colors.White)
-		}
-		FormatedOutput := columnize.SimpleFormat(Output)
-		TextView.SetText(FormatedOutput)
-		TextView.ScrollToBeginning()
-		TextViewData = FormatedOutput
+		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/")
+		GetAllMCPInfo(Files)
 
 	} else if list_item_name == "MC" {
 		List2.SetTitle("MC")
@@ -338,11 +276,12 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = FormatedOutput
 
 	} else if list_item_name == "CSR" {
-		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
-		List2.SetTitle("CSR")
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
+		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
+		List2.SetTitle("CSR")
+		GetCSRInfo()
 		List2.AddItem("All Certificate Signing Requests", "", 0, nil)
 		for _, File := range Files {
 			List2.AddItem(strings.Split(File.Name(), ".yaml")[0], "", 0, nil)

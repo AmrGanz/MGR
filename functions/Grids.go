@@ -140,6 +140,7 @@ func CreateUI() {
 	List1.SetHighlightFullLine(true)
 	List1.
 		ShowSecondaryText(false).
+		AddItem("Summary", "", 0, nil).
 		AddItem("Configurations", "", 0, nil).
 		AddItem("Projects", "", 0, nil).
 		AddItem("Nodes", "", 0, nil).
@@ -195,8 +196,6 @@ func CreateUI() {
 		SetRows(rows...).
 		SetColumns(columns...).
 		SetBorders(true).
-		// AddItem(ClusterInfoButton, 0, 0, 1, 1, 0, 0, false).
-		// AddItem(ClusterStatusButton, 0, 1, 1, 1, 0, 0, false).
 		AddItem(MGDropDown, 0, 0, 1, 4, 0, 0, false).
 		AddItem(ActivePathBox, 0, 4, 1, 1, 0, 0, false).
 		AddItem(HelpButton, 0, 5, 1, 1, 0, 0, false).

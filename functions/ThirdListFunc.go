@@ -34,30 +34,34 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			// Summary of all projects
 			TextView.SetText("To Be Implemented")
 		} else if List3Item == "Pods" {
-			fileInfo, _ := ioutil.ReadDir(BasePath + "namespaces/")
-			if len(fileInfo) > 0 {
+			Files, _ = ioutil.ReadDir(BasePath + "namespaces/")
+			if len(Files) > 0 {
 				// Cleaning TextView and TextViewData
 				TextView.Clear()
 				TextViewData = ""
 				// Getting current timestamp
 				now := time.Now().UTC()
-				Output = []string{Colors.Yellow + "NAMESPACE" + "|" + "NAME" + "|" + "READY" + "|" + "STATUS" + "|" + "RESTARTS" + "|" + "Age" + Colors.White}
-				for projectIndex := 0; projectIndex < len(fileInfo); projectIndex++ {
+				Output = []string{Colors.Yellow + "NAMESPACE" + "|" + "NAME" + "|" + Colors.Yellow + "READY" + Colors.Yellow + "|" + Colors.Yellow + "STATUS" + Colors.Yellow + "|" + Colors.Yellow + "RESTARTS" + Colors.Yellow + "|" + "Age" + Colors.White}
+				for projectIndex := 0; projectIndex < len(Files); projectIndex++ {
 					// Get project's pods "regardless of it's type/status" I can add the owner column if possible
-					if _, err := os.Stat(BasePath + "namespaces/" + fileInfo[projectIndex].Name() + "/core/pods.yaml"); err == nil {
-						yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + fileInfo[projectIndex].Name() + "/core/pods.yaml")
-						m := make(map[interface{}]interface{})
-						yaml.Unmarshal(yfile, m)
-						items, _ := m["items"].([]interface{})
+					if _, err := os.Stat(BasePath + "namespaces/" + Files[projectIndex].Name() + "/core/pods.yaml"); err == nil {
+						File, _ = ioutil.ReadFile(BasePath + "namespaces/" + Files[projectIndex].Name() + "/core/pods.yaml")
+						// m := make(map[interface{}]interface{})
+						MyPods := PODS{}
+						yaml.Unmarshal(File, &MyPods)
+						items := MyPods.Items
 						if len(items) > 0 {
 							// Loop between pods
 							for i := 0; i < len(items); i++ {
-								pod := items[i].(map[interface{}]interface{})
-								name := pod["metadata"].(map[interface{}]interface{})["name"]
-								nameS := fmt.Sprintf("%v", name)
-								Status := pod["status"].(map[interface{}]interface{})["phase"]
-								StatusS := fmt.Sprintf("%v", Status)
-								CreationTime := pod["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+								name := items[i].Metadata.Name
+								Status := items[i].Status.Phase
+								if Status == "Running" || Status == "Succeeded" || Status == "Completed" {
+									Status = Colors.White + Status + Colors.White
+								} else {
+									Status = Colors.Red + Status + Colors.White
+								}
+
+								CreationTime := items[i].Metadata.CreationTimestamp
 								CreationTimeS := fmt.Sprintf("%v", CreationTime)
 								t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 								diff := now.Sub(t1).Seconds()
@@ -75,22 +79,34 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 									age = minutes + "m" + seconds + "s"
 								}
 								// Initializing Ready Container count
-								readyCont := 0
+								readyCount := 0
 								// Initializing number of restarts
 								restarts := 0
-								containerStatuses := pod["status"].(map[interface{}]interface{})["containerStatuses"].([]interface{})
-								for i := 0; i < len(containerStatuses); i++ {
-									restartCount := containerStatuses[i].(map[interface{}]interface{})["restartCount"]
+								containerStatuses := items[i].Status.ContainerStatuses
+								for x := 0; x < len(containerStatuses); x++ {
+									restartCount := containerStatuses[x].RestartCount
 
-									if containerStatuses[i].(map[interface{}]interface{})["ready"] == true {
-										readyCont++
+									if containerStatuses[x].Ready == true {
+										readyCount++
 									}
-									restarts += restartCount.(int)
+									restarts += restartCount
 								}
-								containers := fmt.Sprintf("%v", len(containerStatuses))
-								restartsS := fmt.Sprintf("%v", restarts)
-								readyContS := fmt.Sprintf("%v", readyCont)
-								Output = append(Output, Colors.White+nameS+fileInfo[projectIndex].Name()+"|"+nameS+"|"+readyContS+"/"+containers+"|"+StatusS+"|"+restartsS+"|"+age+Colors.White)
+								restartsS := ""
+								if restarts > 0 {
+									restartsS = Colors.Orange + fmt.Sprintf("%v", restarts) + Colors.White
+								} else {
+									restartsS = Colors.White + fmt.Sprintf("%v", restarts) + Colors.White
+								}
+								containers := len(items[i].Spec.Containers)
+								containersS := fmt.Sprintf("%v", containers)
+								readyConutS := fmt.Sprintf("%v", readyCount)
+								READY := ""
+								if readyCount != containers {
+									READY = Colors.Orange + readyConutS + "/" + containersS + Colors.White
+								} else {
+									READY = Colors.White + readyConutS + "/" + containersS + Colors.White
+								}
+								Output = append(Output, Colors.White+Files[projectIndex].Name()+"|"+name+"|"+READY+"|"+Status+"|"+restartsS+"|"+age+Colors.White)
 							}
 							FormatedOutput = columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -145,7 +161,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 								} else if hours == "0" {
 									age = minutes + "m" + seconds + "s"
 								}
-								Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+readyS+"|"+UpToDate+"|"+availableS+"|"+age+Colors.White)
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+readyS+"|"+UpToDate+"|"+availableS+"|"+age+Colors.White)
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -219,7 +235,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 								} else if hours == "0" {
 									age = minutes + "m" + seconds + "s"
 								}
-								Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+revisionS+"|"+desiredS+"|"+currentS+"|"+triggersType+"|"+age+Colors.White)
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+revisionS+"|"+desiredS+"|"+currentS+"|"+triggersType+"|"+age+Colors.White)
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -310,7 +326,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 									age = minutes + "m" + seconds + "s"
 								}
 
-								Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+desiredS+"|"+currentS+"|"+readyS+"|"+uptodateS+"|"+availableS+"|"+nodeselectorS+"|"+age+"|"+Colors.White)
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+desiredS+"|"+currentS+"|"+readyS+"|"+uptodateS+"|"+availableS+"|"+nodeselectorS+"|"+age+"|"+Colors.White)
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -396,7 +412,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 									ports_proto = "None"
 								}
 
-								Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+StypeS+"|"+clusterIPS+"|"+externalIPS+"|"+ports_proto+"|"+age+"|"+"\n")
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+StypeS+"|"+clusterIPS+"|"+externalIPS+"|"+ports_proto+"|"+age+"|"+"\n")
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -473,7 +489,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 									age = minutes + "m" + seconds + "s"
 								}
 
-								Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+hostS+"|"+""+"|"+servicesS+"|"+portS+"|"+term+"|"+wildcardS+"|"+age+"|"+"\n")
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+hostS+"|"+""+"|"+servicesS+"|"+portS+"|"+term+"|"+wildcardS+"|"+age+"|"+"\n")
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -537,7 +553,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 									age = minutes + "m" + seconds + "s"
 								}
 
-								Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+tagsS+"|"+age+Colors.White)
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+tagsS+"|"+age+Colors.White)
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -604,7 +620,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 								} else if hours == "0" {
 									age = minutes + "m" + seconds + "s"
 								}
-								Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+statusS+"|"+volumeS+"|"+capacityS+"|"+accessS+"|"+storageCS+"|"+age+"\n")
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+statusS+"|"+volumeS+"|"+capacityS+"|"+accessS+"|"+storageCS+"|"+age+"\n")
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -663,7 +679,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 									age = minutes + "m" + seconds + "s"
 								}
 
-								Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+dataS+"|"+age+Colors.White)
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+dataS+"|"+age+Colors.White)
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -724,7 +740,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 									age = minutes + "m" + seconds + "s"
 								}
 
-								Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+type_keyS+"|"+dataS+"|"+age+"\n")
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+type_keyS+"|"+dataS+"|"+age+"\n")
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -762,7 +778,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 						channel := m["spec"].(map[interface{}]interface{})["channel"]
 						channelS := fmt.Sprintf("%v", channel)
 
-						Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+packageS+"|"+sourceS+"|"+channelS+Colors.White)
+						Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+packageS+"|"+sourceS+"|"+channelS+Colors.White)
 					}
 					FormatedOutput := columnize.SimpleFormat(Output)
 					TextView.SetText(FormatedOutput)
@@ -801,7 +817,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 						phase := m["status"].(map[interface{}]interface{})["phase"]
 						phaseS := fmt.Sprintf("%v", phase)
 
-						Output = append(Output, Colors.White+nameS+namespaces[projectIndex].Name()+"|"+nameS+"|"+displayS+"|"+versionS+"|"+replaceS+"|"+phaseS+"\n")
+						Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+displayS+"|"+versionS+"|"+replaceS+"|"+phaseS+"\n")
 
 						FormatedOutput := columnize.SimpleFormat(Output)
 						TextView.SetText(FormatedOutput)
@@ -864,68 +880,74 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			TextView.Clear()
 			TextViewData = ""
 			List4.SetTitle("Pods")
-			Output = []string{Colors.Yellow + "NAME" + "|" + "READY" + "|" + "STATUS" + "|" + "RESTARTS" + "|" + "AGE" + Colors.White}
+			Output = []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "READY" + Colors.Yellow + "|" + Colors.Yellow + "STATUS" + Colors.Yellow + "|" + Colors.Yellow + "RESTARTS" + Colors.Yellow + "|" + "AGE" + Colors.White}
 			// Get project's pods "regardless of it's type/status" I can add the owner column if possible
-			if _, err := os.Stat(BasePath + "namespaces/" + List2Item + "/core/pods.yaml"); err == nil {
-				yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/pods.yaml")
-				m := make(map[interface{}]interface{})
-				yaml.Unmarshal(yfile, m)
-				items, _ := m["items"].([]interface{})
-				now := time.Now().UTC()
-				if len(items) > 0 {
-					// Loop between pods
-					for i := 0; i < len(items); i++ {
-						pod := items[i].(map[interface{}]interface{})
-						name := pod["metadata"].(map[interface{}]interface{})["name"]
-						nameS := fmt.Sprintf("%v", name)
-						List4.AddItem(nameS, "", 0, nil)
-						Status := pod["status"].(map[interface{}]interface{})["phase"]
-						StatusS := fmt.Sprintf("%v", Status)
-						// Initializing Ready Container count
-						readyCont := 0
-						// Initializing number of restarts
-						restarts := 0
-						containerStatuses := pod["status"].(map[interface{}]interface{})["containerStatuses"].([]interface{})
-						for i := 0; i < len(containerStatuses); i++ {
-							restartCount := containerStatuses[i].(map[interface{}]interface{})["restartCount"]
+			File, _ = ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/pods.yaml")
+			MyPods := PODS{}
+			yaml.Unmarshal(File, &MyPods)
+			items := MyPods.Items
+			now := time.Now().UTC()
+			// Loop between pods
+			for i := 0; i < len(items); i++ {
+				name := items[i].Metadata.Name
 
-							if containerStatuses[i].(map[interface{}]interface{})["ready"] == true {
-								readyCont++
-							}
-							restarts += restartCount.(int)
-						}
-						containers := fmt.Sprintf("%v", len(containerStatuses))
-						restartsS := fmt.Sprintf("%v", restarts)
-						readyContS := fmt.Sprintf("%v", readyCont)
-
-						CreationTime := pod["metadata"].(map[interface{}]interface{})["creationTimestamp"]
-						CreationTimeS := fmt.Sprintf("%v", CreationTime)
-						t1, _ := time.Parse(time.RFC3339, CreationTimeS)
-						diff := now.Sub(t1).Seconds()
-						diffI := int(diff)
-						seconds := strconv.Itoa((diffI % 60))
-						minutes := strconv.Itoa((diffI / 60) % 60)
-						hours := strconv.Itoa((diffI / 360) % 24)
-						days := strconv.Itoa((diffI / 86400))
-						age := ""
-						if days != "0" {
-							age = days + "d" + hours + "h"
-						} else if days == "0" && hours != "" {
-							age = hours + "h" + minutes + "m"
-						} else if hours == "0" {
-							age = minutes + "m" + seconds + "s"
-						}
-						Output = append(Output, Colors.White+nameS+nameS+"|"+readyContS+"/"+containers+"|"+StatusS+"|"+restartsS+"|"+age+Colors.White)
-					}
-					FormatedOutput = columnize.SimpleFormat(Output)
-					TextView.SetText(FormatedOutput)
-					TextView.ScrollToBeginning()
-					TextViewData = FormatedOutput
+				List4.AddItem(name, "", 0, nil)
+				Status := items[i].Status.Phase
+				if Status == "Running" || Status == "Succeeded" || Status == "Completed" {
+					Status = Colors.White + Status + Colors.White
+				} else {
+					Status = Colors.Red + Status + Colors.White
 				}
+				// Initializing Ready Container count and number of restarts
+				readyCount := 0
+				restartsCount := 0
+				containerStatuses := items[i].Status.ContainerStatuses
+				for x := 0; x < len(containerStatuses); x++ {
+					restartCount := containerStatuses[x].RestartCount
 
-			} else {
-				// I have to read Pods files from under [BasePath + "namespaces/" + List2Item + "/pods/"] and loop between them
+					if containerStatuses[x].Ready == true {
+						readyCount++
+					}
+					restartsCount += restartCount
+				}
+				restartsS := ""
+				if restartsCount > 0 {
+					restartsS = Colors.Orange + fmt.Sprintf("%v", restartsCount) + Colors.White
+				} else {
+					restartsS = Colors.White + fmt.Sprintf("%v", restartsCount) + Colors.White
+				}
+				containers := len(items[i].Spec.Containers)
+				containersS := fmt.Sprintf("%v", containers)
+				readyConutS := fmt.Sprintf("%v", readyCount)
+				READY := ""
+				if readyCount != containers {
+					READY = Colors.Orange + readyConutS + "/" + containersS + Colors.White
+				} else {
+					READY = Colors.White + readyConutS + "/" + containersS + Colors.White
+				}
+				CreationTime := items[i].Metadata.CreationTimestamp
+				CreationTimeS := fmt.Sprintf("%v", CreationTime)
+				t1, _ := time.Parse(time.RFC3339, CreationTimeS)
+				diff := now.Sub(t1).Seconds()
+				diffI := int(diff)
+				seconds := strconv.Itoa((diffI % 60))
+				minutes := strconv.Itoa((diffI / 60) % 60)
+				hours := strconv.Itoa((diffI / 360) % 24)
+				days := strconv.Itoa((diffI / 86400))
+				age := ""
+				if days != "0" {
+					age = days + "d" + hours + "h"
+				} else if days == "0" && hours != "" {
+					age = hours + "h" + minutes + "m"
+				} else if hours == "0" {
+					age = minutes + "m" + seconds + "s"
+				}
+				Output = append(Output, Colors.White+name+"|"+READY+"|"+Status+"|"+restartsS+"|"+age+Colors.White)
 			}
+			FormatedOutput = columnize.SimpleFormat(Output)
+			TextView.SetText(FormatedOutput)
+			TextView.ScrollToBeginning()
+			TextViewData = FormatedOutput
 
 		} else if List3Item == "Deployment" {
 			// Get projects deployments "if exists"
@@ -969,7 +991,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, Colors.White+nameS+nameS+"|"+readyS+"|"+UpToDate+"|"+availableS+"|"+age+Colors.White)
+					Output = append(Output, Colors.White+nameS+"|"+readyS+"|"+UpToDate+"|"+availableS+"|"+age+Colors.White)
 				}
 				FormatedOutput := columnize.SimpleFormat(Output)
 				TextView.SetText(FormatedOutput)
@@ -1017,7 +1039,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 						}
 					}
 
-					Output = append(Output, Colors.White+nameS+nameS+"|"+revisionS+"|"+desiredS+"|"+currentS+"|"+triggersType+Colors.White)
+					Output = append(Output, Colors.White+nameS+"|"+revisionS+"|"+desiredS+"|"+currentS+"|"+triggersType+Colors.White)
 				}
 				FormatedOutput := columnize.SimpleFormat(Output)
 				TextView.SetText(FormatedOutput)
@@ -1099,7 +1121,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, Colors.White+nameS+nameS+"|"+desiredS+"|"+currentS+"|"+readyS+"|"+uptodateS+"|"+availableS+"|"+nodeselectorS+"|"+age+"|"+Colors.White)
+					Output = append(Output, Colors.White+nameS+"|"+desiredS+"|"+currentS+"|"+readyS+"|"+uptodateS+"|"+availableS+"|"+nodeselectorS+"|"+age+"|"+Colors.White)
 				}
 				FormatedOutput := columnize.SimpleFormat(Output)
 				TextView.SetText(FormatedOutput)
@@ -1182,7 +1204,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 						ports_proto = "None"
 					}
 
-					Output = append(Output, Colors.White+nameS+nameS+"|"+StypeS+"|"+clusterIPS+"|"+externalIPS+"|"+ports_proto+"|"+age+"|"+Colors.White)
+					Output = append(Output, Colors.White+nameS+"|"+StypeS+"|"+clusterIPS+"|"+externalIPS+"|"+ports_proto+"|"+age+"|"+Colors.White)
 				}
 				FormatedOutput := columnize.SimpleFormat(Output)
 				TextView.SetText(FormatedOutput)
@@ -1252,7 +1274,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, Colors.White+nameS+nameS+"|"+hostS+"|"+""+"|"+servicesS+"|"+portS+"|"+term+"|"+wildcardS+"|"+age+"|"+Colors.White)
+					Output = append(Output, Colors.White+nameS+"|"+hostS+"|"+""+"|"+servicesS+"|"+portS+"|"+term+"|"+wildcardS+"|"+age+"|"+Colors.White)
 				}
 				FormatedOutput := columnize.SimpleFormat(Output)
 				TextView.SetText(FormatedOutput)
@@ -1376,7 +1398,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, Colors.White+nameS+nameS+"|"+statusS+"|"+volumeS+"|"+capacityS+"|"+accessS+"|"+storageCS+"|"+age+Colors.White)
+					Output = append(Output, Colors.White+nameS+"|"+statusS+"|"+volumeS+"|"+capacityS+"|"+accessS+"|"+storageCS+"|"+age+Colors.White)
 				}
 				FormatedOutput := columnize.SimpleFormat(Output)
 				TextView.SetText(FormatedOutput)
@@ -1432,7 +1454,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, Colors.White+nameS+nameS+"|"+dataS+"|"+age+Colors.White)
+					Output = append(Output, Colors.White+nameS+"|"+dataS+"|"+age+Colors.White)
 				}
 				FormatedOutput := columnize.SimpleFormat(Output)
 				TextView.SetText(FormatedOutput)
@@ -1492,7 +1514,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, Colors.White+nameS+nameS+"|"+type_keyS+"|"+dataS+"|"+age+Colors.White)
+					Output = append(Output, Colors.White+nameS+"|"+type_keyS+"|"+dataS+"|"+age+Colors.White)
 				}
 				FormatedOutput := columnize.SimpleFormat(Output)
 				TextView.SetText(FormatedOutput)
@@ -1525,7 +1547,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 				channel := m["spec"].(map[interface{}]interface{})["channel"]
 				channelS := fmt.Sprintf("%v", channel)
 
-				Output = append(Output, Colors.White+nameS+nameS+"|"+packageS+"|"+sourceS+"|"+channelS+Colors.White)
+				Output = append(Output, Colors.White+nameS+"|"+packageS+"|"+sourceS+"|"+channelS+Colors.White)
 
 			}
 			FormatedOutput := columnize.SimpleFormat(Output)
@@ -1562,7 +1584,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 				phase := m["status"].(map[interface{}]interface{})["phase"]
 				phaseS := fmt.Sprintf("%v", phase)
 
-				Output = append(Output, Colors.White+nameS+nameS+"|"+displayS+"|"+versionS+"|"+replaceS+"|"+phaseS+Colors.White)
+				Output = append(Output, Colors.White+nameS+"|"+displayS+"|"+versionS+"|"+replaceS+"|"+phaseS+Colors.White)
 			}
 			FormatedOutput := columnize.SimpleFormat(Output)
 			TextView.SetText(FormatedOutput)
@@ -1575,8 +1597,8 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		GetNodesInfo(List2Item, "Details")
 	} else if List1Item == "Nodes" && List3Item == "YAML" {
 		// Get node's YAML
-		fileInfo, _ := os.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + List2Item + ".yaml")
-		TextView.SetText(string(fileInfo))
+		File, _ = os.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + List2Item + ".yaml")
+		TextView.SetText(string(File))
 		TextViewData = TextView.GetText(false)
 		TextView.ScrollToBeginning()
 		List6.AddItem("Metadata", "", 0, nil).AddItem("Spec", "", 0, nil).AddItem("Status", "", 0, nil).AddItem("HW Spec", "", 0, nil).AddItem("Images", "", 0, nil)
@@ -1656,7 +1678,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 
 		}
 		// fmt.Print(nameS + "\t" + versionS + "\t" + availableS + "\t" + progressingS + "\t" + degradedS + "\t" + availableSince + Colors.White)
-		Output = append(Output, Colors.White+nameS+nameS+"|"+versionS+"|"+availableS+"|"+progressingS+"|"+degradedS+"|"+availableSince+Colors.White)
+		Output = append(Output, Colors.White+nameS+"|"+versionS+"|"+availableS+"|"+progressingS+"|"+degradedS+"|"+availableSince+Colors.White)
 
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)
@@ -1666,82 +1688,8 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
-		Output := []string{Colors.Yellow + "NAME" + "|" + "CONFIG" + "|" + "UPDATED" + "|" + "UPDATING" + "|" + "DEGRADED" + "|" + "MACHINECOUNT" + "|" + "READYMACHINECOUNT" + "|" + "UPDATEDMACHINECOUNT" + "|" + "DEGRADEDMACHINECOUNT" + "|" + "AGE" + Colors.White}
-
-		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + List2Item + ".yaml")
-
-		m := make(map[string]interface{})
-		yaml.Unmarshal(yfile, m)
-
-		name := m["metadata"].(map[interface{}]interface{})["name"]
-		nameS := fmt.Sprintf("%v", name)
-
-		config := m["status"].(map[interface{}]interface{})["configuration"].(map[interface{}]interface{})["name"]
-		configS := fmt.Sprintf("%v", config)
-
-		status := m["status"].(map[interface{}]interface{})["conditions"].([]interface{})
-		updatedS := ""
-		updatingS := ""
-		degradedS := ""
-		for i := range status {
-			if status[i].(map[interface{}]interface{})["type"] == "Updated" {
-				if status[i].(map[interface{}]interface{})["status"] == "True" {
-					updatedS = "True"
-				} else {
-					updatedS = "False"
-				}
-
-			} else if status[i].(map[interface{}]interface{})["type"] == "Updating" {
-				if status[i].(map[interface{}]interface{})["status"] == "True" {
-					updatingS = "True"
-				} else {
-					updatingS = "False"
-				}
-			} else if status[i].(map[interface{}]interface{})["type"] == "Degraded" {
-				if status[i].(map[interface{}]interface{})["status"] == "True" {
-					degradedS = "True"
-				} else {
-					degradedS = "False"
-				}
-			}
-
-		}
-		machineCount := m["status"].(map[interface{}]interface{})["machineCount"]
-		machineCountS := fmt.Sprintf("%v", machineCount)
-
-		machineReady := m["status"].(map[interface{}]interface{})["readyMachineCount"]
-		machineReadyS := fmt.Sprintf("%v", machineReady)
-
-		machineUpdated := m["status"].(map[interface{}]interface{})["updatedMachineCount"]
-		machineUpdatedS := fmt.Sprintf("%v", machineUpdated)
-
-		machineDegraded := m["status"].(map[interface{}]interface{})["degradedMachineCount"]
-		machineDegradedS := fmt.Sprintf("%v", machineDegraded)
-
-		now := time.Now().UTC()
-		CreationTime := m["metadata"].(map[interface{}]interface{})["creationTimestamp"]
-		CreationTimeS := fmt.Sprintf("%v", CreationTime)
-		t1, _ := time.Parse(time.RFC3339, CreationTimeS)
-		diff := now.Sub(t1).Seconds()
-		diffI := int(diff)
-		seconds := strconv.Itoa((diffI % 60))
-		minutes := strconv.Itoa((diffI / 60) % 60)
-		hours := strconv.Itoa((diffI / 360) % 24)
-		days := strconv.Itoa((diffI / 86400))
-		age := ""
-		if days != "0" {
-			age = days + "d" + hours + "h"
-		} else if days == "0" && hours != "" {
-			age = hours + "h" + minutes + "m"
-		} else if hours == "0" {
-			age = minutes + "m" + seconds + "s"
-		}
-		Output = append(Output, Colors.White+nameS+nameS+"|"+configS+"|"+updatedS+"|"+updatingS+"|"+degradedS+"|"+machineCountS+"|"+machineReadyS+"|"+machineUpdatedS+"|"+machineDegradedS+"|"+age+Colors.White)
-
-		FormatedOutput := columnize.SimpleFormat(Output)
-		TextView.SetText(FormatedOutput)
-		TextView.ScrollToBeginning()
-		TextViewData = FormatedOutput
+		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + List2Item + ".yaml")
+		GetMCPInfo(File)
 
 	} else if List1Item == "MCP" && List3Item == "YAML" {
 		mcpFile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + List2Item + ".yaml")
@@ -1786,7 +1734,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		} else if hours == "0" {
 			age = minutes + "m" + seconds + "s"
 		}
-		Output = append(Output, Colors.White+nameS+nameS+"|"+generatedByS+"|"+ignitionVersionS+"|"+age+Colors.White)
+		Output = append(Output, Colors.White+nameS+"|"+generatedByS+"|"+ignitionVersionS+"|"+age+Colors.White)
 
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)
@@ -1870,7 +1818,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			age = minutes + "m" + seconds + "s"
 		}
 
-		Output = append(Output, Colors.White+nameS+nameS+"|"+capacityS+"|"+accessS+"|"+reclaimS+"|"+statusS+"|"+claimS+"|"+storageclassS+"|"+age+Colors.White)
+		Output = append(Output, Colors.White+nameS+"|"+capacityS+"|"+accessS+"|"+reclaimS+"|"+statusS+"|"+claimS+"|"+storageclassS+"|"+age+Colors.White)
 
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)
