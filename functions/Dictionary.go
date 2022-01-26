@@ -46,8 +46,8 @@ var height = 1
 var width = 15
 var rows []int = []int{height, 20, 10, 0, height}
 var columns []int = []int{width, width, width, width, 0, width, width, width}
-var ProvidedDirPath = "empty"
-var BasePath = "empty"
+var ProvidedDirPath = ""
+var BasePath = ""
 
 var MyNode_Public = NODE{}
 var YamlFile []byte

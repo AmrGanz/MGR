@@ -10,6 +10,24 @@ import (
 	"github.com/rivo/tview"
 )
 
+func MGDropDownOnSelect(text string, index int) {
+	if _, value := MGDropDown.GetCurrentOption(); value != "" {
+		List1.Clear()
+		List1.
+			ShowSecondaryText(false).
+			AddItem("Summary", "", 0, nil).
+			AddItem("OCP Version", "", 0, nil).
+			AddItem("Configurations", "", 0, nil).
+			AddItem("Projects", "", 0, nil).
+			AddItem("Nodes", "", 0, nil).
+			AddItem("Operators", "", 0, nil).
+			AddItem("MCP", "", 0, nil).
+			AddItem("MC", "", 0, nil).
+			AddItem("PV", "", 0, nil).
+			AddItem("CSR", "", 0, nil)
+	}
+}
+
 func OnHelp() {
 	Help, err := ioutil.ReadFile("Help.txt")
 	if err != nil {
@@ -133,23 +151,26 @@ func CreateUI() {
 	// Setting SearchBox attributes
 	HelpButton.SetSelectedFunc(OnHelp)
 
+	// Set MGdropDown On Select Function
+	MGDropDown.SetSelectedFunc(MGDropDownOnSelect)
+
 	// inittializing the List1 widget with common attributes
 	List1.
 		SetBorder(true).
 		SetTitle("Resources")
 	List1.SetHighlightFullLine(true)
-	List1.
-		ShowSecondaryText(false).
-		AddItem("Summary", "", 0, nil).
-		AddItem("OCP Version", "", 0, nil).
-		AddItem("Configurations", "", 0, nil).
-		AddItem("Projects", "", 0, nil).
-		AddItem("Nodes", "", 0, nil).
-		AddItem("Operators", "", 0, nil).
-		AddItem("MCP", "", 0, nil).
-		AddItem("MC", "", 0, nil).
-		AddItem("PV", "", 0, nil).
-		AddItem("CSR", "", 0, nil)
+	// List1.
+	// 	ShowSecondaryText(false).
+	// 	AddItem("Summary", "", 0, nil).
+	// 	AddItem("OCP Version", "", 0, nil).
+	// 	AddItem("Configurations", "", 0, nil).
+	// 	AddItem("Projects", "", 0, nil).
+	// 	AddItem("Nodes", "", 0, nil).
+	// 	AddItem("Operators", "", 0, nil).
+	// 	AddItem("MCP", "", 0, nil).
+	// 	AddItem("MC", "", 0, nil).
+	// 	AddItem("PV", "", 0, nil).
+	// 	AddItem("CSR", "", 0, nil)
 	List1.SetSelectedFunc(FirstListOnSelect)
 	// inittializing the List4 widget with common attributes
 	List2.

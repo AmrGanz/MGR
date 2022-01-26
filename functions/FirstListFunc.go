@@ -220,7 +220,8 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/core/nodes/")
 		List2.
 			AddItem("Nodes Summary", "", 0, nil).
-			AddItem("Nodes Details", "", 0, nil)
+			AddItem("Nodes Details", "", 0, nil).
+			AddItem("Nodes Labels", "", 0, nil)
 		// Populate List2 with nodes names
 		for _, node := range files {
 			nodeName := strings.Split(node.Name(), ".yaml")

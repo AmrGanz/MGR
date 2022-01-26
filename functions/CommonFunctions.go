@@ -22,7 +22,7 @@ func GetNodesInfo(NodeName string, Flag string) {
 			TextView.SetText(Err.Error())
 		} else {
 			if Flag == "Summary" {
-				Output = []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "STATUS" + Colors.Yellow + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSION" + Colors.White + "\n"}
+				Output = []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "STATUS" + Colors.Yellow + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSION" + Colors.White}
 				for i := range Files {
 					ReadNodeYaml(Files[i].Name(), "Summary")
 				}
@@ -30,6 +30,11 @@ func GetNodesInfo(NodeName string, Flag string) {
 				Output = []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "STATUS" + Colors.Yellow + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSION" + "|" + "INTERNAL-IP" + "|" + "EXTERNAL-IP" + "|" + "OS-IMAGE" + "|" + "KERNEL-VERSION" + "|" + "CONTAINER-RUNTIME" + Colors.White + "\n"}
 				for i := range Files {
 					ReadNodeYaml(Files[i].Name(), "Details")
+				}
+			} else if Flag == "Labels" {
+				Output = []string{Colors.Yellow + "NAME" + "|" + "LABELS" + Colors.White}
+				for i := range Files {
+					ReadNodeYaml(Files[i].Name(), "Labels")
 				}
 			}
 		}
@@ -56,79 +61,95 @@ func ReadNodeYaml(NodeFileName string, Flag string) {
 	yaml.Unmarshal(File, &MyNode)
 	MyNode_Public = MyNode
 	name := MyNode.Metadata.Name
-
-	conditions := MyNode.Status.Conditions
-	statusS := ""
-	for i := 0; i < len(conditions); i++ {
-		if MyNode.Status.Conditions[i].Type == "Ready" {
-			if MyNode.Status.Conditions[i].Status == "True" {
-				if MyNode.Spec.Unschedulable {
-					statusS = Colors.Orange + "Ready,SchedulingDisabled" + Colors.White
-				} else {
-					statusS = Colors.Green + "Ready" + Colors.White
-				}
-
+	Labels := ""
+	if Flag == "Labels" {
+		i := len(MyNode.Metadata.Labels)
+		for key, value := range MyNode.Metadata.Labels {
+			if i > 1 {
+				Labels += key + "=" + value + ","
+				i--
 			} else {
-				if MyNode.Spec.Unschedulable {
-					statusS = Colors.Red + "NotReady,SchedulingDisabled" + Colors.White
+				Labels += key + value
+			}
+
+		}
+		Output = append(Output, Colors.White+name+"|"+Labels+Colors.White)
+
+	} else {
+		conditions := MyNode.Status.Conditions
+		statusS := ""
+		for i := 0; i < len(conditions); i++ {
+			if MyNode.Status.Conditions[i].Type == "Ready" {
+				if MyNode.Status.Conditions[i].Status == "True" {
+					if MyNode.Spec.Unschedulable {
+						statusS = Colors.Orange + "Ready,SchedulingDisabled" + Colors.White
+					} else {
+						statusS = Colors.Green + "Ready" + Colors.White
+					}
+
 				} else {
-					statusS = Colors.Red + "NotReady" + Colors.White
+					if MyNode.Spec.Unschedulable {
+						statusS = Colors.Red + "NotReady,SchedulingDisabled" + Colors.White
+					} else {
+						statusS = Colors.Red + "NotReady" + Colors.White
+					}
 				}
 			}
 		}
-	}
-	roles := ""
-	Labels := MyNode.Metadata.Labels
-	for key := range Labels {
-		if strings.Contains(key, "node-role.kubernetes.io") {
-			roles += strings.Split(key, "/")[1] + " "
-		}
-	}
-
-	CreationTime := MyNode.Metadata.CreationTimestamp
-	diff := now.Sub(CreationTime).Seconds()
-	diffInt := int(diff)
-	seconds := strconv.Itoa((diffInt % 60))
-	minutes := strconv.Itoa((diffInt / 60) % 60)
-	hours := strconv.Itoa((diffInt / 360) % 24)
-	days := strconv.Itoa((diffInt / 86400))
-	age := ""
-	if days != "0" {
-		age = days + "d" + hours + "h"
-	} else if days == "0" && hours != "" {
-		age = hours + "h" + minutes + "m"
-	} else if hours == "0" {
-		age = minutes + "m" + seconds + "s"
-	}
-
-	versionS := ""
-	version := MyNode.Status.NodeInfo.KubeletVersion
-	if Flag == "Summary" {
-		versionS = fmt.Sprintf("%v", version)
-		Output = append(Output, Colors.White+name+"|"+statusS+"|"+roles+"|"+age+"|"+versionS+Colors.White+"\n")
-	} else if Flag == "Details" {
-		versionS = fmt.Sprintf("%v", version)
-
-		Addresses := MyNode.Status.Addresses
-		internalIP := ""
-		externalIP := ""
-		for i := range Addresses {
-			if Addresses[i].Type == "InternalIP" {
-				internalIP = Addresses[i].Address
-			} else if Addresses[i].Type == "ExternalIP" {
-				externalIP = Addresses[i].Address
-
+		roles := ""
+		Labels := MyNode.Metadata.Labels
+		for key := range Labels {
+			if strings.Contains(key, "node-role.kubernetes.io") {
+				roles += strings.Split(key, "/")[1] + " "
 			}
 		}
 
-		osImage := MyNode.Status.NodeInfo.OsImage
+		CreationTime := MyNode.Metadata.CreationTimestamp
+		diff := now.Sub(CreationTime).Seconds()
+		diffInt := int(diff)
+		seconds := strconv.Itoa((diffInt % 60))
+		minutes := strconv.Itoa((diffInt / 60) % 60)
+		hours := strconv.Itoa((diffInt / 360) % 24)
+		days := strconv.Itoa((diffInt / 86400))
+		age := ""
+		if days != "0" {
+			age = days + "d" + hours + "h"
+		} else if days == "0" && hours != "" {
+			age = hours + "h" + minutes + "m"
+		} else if hours == "0" {
+			age = minutes + "m" + seconds + "s"
+		}
 
-		kernelVersion := MyNode.Status.NodeInfo.KernelVersion
+		versionS := ""
+		version := MyNode.Status.NodeInfo.KubeletVersion
+		if Flag == "Summary" {
+			versionS = fmt.Sprintf("%v", version)
+			Output = append(Output, Colors.White+name+"|"+statusS+"|"+roles+"|"+age+"|"+versionS+Colors.White+"\n")
+		} else if Flag == "Details" {
+			versionS = fmt.Sprintf("%v", version)
 
-		contRuntime := MyNode.Status.NodeInfo.ContainerRuntimeVersion
+			Addresses := MyNode.Status.Addresses
+			internalIP := ""
+			externalIP := ""
+			for i := range Addresses {
+				if Addresses[i].Type == "InternalIP" {
+					internalIP = Addresses[i].Address
+				} else if Addresses[i].Type == "ExternalIP" {
+					externalIP = Addresses[i].Address
 
-		Output = append(Output, Colors.White+name+"|"+statusS+"|"+roles+"|"+age+"|"+versionS+"|"+internalIP+"|"+externalIP+"|"+osImage+"|"+kernelVersion+"|"+contRuntime+Colors.White+"\n")
+				}
+			}
+
+			osImage := MyNode.Status.NodeInfo.OsImage
+
+			kernelVersion := MyNode.Status.NodeInfo.KernelVersion
+
+			contRuntime := MyNode.Status.NodeInfo.ContainerRuntimeVersion
+
+			Output = append(Output, Colors.White+name+"|"+statusS+"|"+roles+"|"+age+"|"+versionS+"|"+internalIP+"|"+externalIP+"|"+osImage+"|"+kernelVersion+"|"+contRuntime+Colors.White+"\n")
+		}
 	}
+
 }
 
 func GetAllMCPInfo(mcp_files []fs.FileInfo) {

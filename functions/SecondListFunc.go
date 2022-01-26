@@ -120,6 +120,8 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 			GetNodesInfo("All Nodes", "Summary")
 		} else if List2Item == "Nodes Details" {
 			GetNodesInfo("All Nodes", "Details")
+		} else if List2Item == "Nodes Labels" {
+			GetNodesInfo("All Nodes", "Labels")
 		} else {
 			GetNodesInfo(List2Item, "Summary")
 			List3.

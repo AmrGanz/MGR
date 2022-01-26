@@ -86,7 +86,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 								for x := 0; x < len(containerStatuses); x++ {
 									restartCount := containerStatuses[x].RestartCount
 
-									if containerStatuses[x].Ready == true {
+									if containerStatuses[x].Ready { // containerStatuses[x].Ready == true
 										readyCount++
 									}
 									restarts += restartCount
@@ -905,7 +905,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 				for x := 0; x < len(containerStatuses); x++ {
 					restartCount := containerStatuses[x].RestartCount
 
-					if containerStatuses[x].Ready == true {
+					if containerStatuses[x].Ready { // containerStatuses[x].Ready == true
 						readyCount++
 					}
 					restartsCount += restartCount
