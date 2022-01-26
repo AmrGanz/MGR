@@ -4,7 +4,7 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 # How to run it:
 - Download and run the executable file "mgr-v0.x":
 ~~~
-# ./mgr <MG path>
+# ./mgr-v0.x <MG path>
 ~~~
 - Or, you can clone the project and build your own executable file as follows [Recommended]:
 ~~~
