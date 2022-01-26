@@ -257,6 +257,48 @@ type OPERATOR struct {
 	} `yaml:"items"`
 }
 
+type OPERATORS struct {
+	APIVersion string `yaml:"apiVersion"`
+	Items      []struct {
+		APIVersion string `yaml:"apiVersion"`
+		Kind       string `yaml:"kind"`
+		Metadata   struct {
+			Annotations struct {
+				ExcludeReleaseOpenshiftIoInternalOpenshiftHosted     string `yaml:"exclude.release.openshift.io/internal-openshift-hosted"`
+				IncludeReleaseOpenshiftIoSelfManagedHighAvailability string `yaml:"include.release.openshift.io/self-managed-high-availability"`
+			} `yaml:"annotations"`
+			CreationTimestamp time.Time `yaml:"creationTimestamp"`
+			Generation        int       `yaml:"generation"`
+			Name              string    `yaml:"name"`
+			ResourceVersion   string    `yaml:"resourceVersion"`
+			SelfLink          string    `yaml:"selfLink"`
+			UID               string    `yaml:"uid"`
+		} `yaml:"metadata"`
+		Spec struct {
+		} `yaml:"spec"`
+		Status struct {
+			Conditions []struct {
+				LastTransitionTime time.Time `yaml:"lastTransitionTime"`
+				Message            string    `yaml:"message"`
+				Reason             string    `yaml:"reason"`
+				Status             string    `yaml:"status"`
+				Type               string    `yaml:"type"`
+			} `yaml:"conditions"`
+			Extension      interface{} `yaml:"extension"`
+			RelatedObjects []struct {
+				Group     string `yaml:"group"`
+				Name      string `yaml:"name"`
+				Resource  string `yaml:"resource"`
+				Namespace string `yaml:"namespace,omitempty"`
+			} `yaml:"relatedObjects"`
+			Versions []struct {
+				Name    string `yaml:"name"`
+				Version string `yaml:"version"`
+			} `yaml:"versions"`
+		} `yaml:"status"`
+	} `yaml:"items"`
+}
+
 type POD struct {
 	APIVersion string `yaml:"apiVersion"`
 	Kind       string `yaml:"kind"`
@@ -602,48 +644,6 @@ type PODS struct {
 			} `yaml:"podIPs"`
 			QosClass  string    `yaml:"qosClass"`
 			StartTime time.Time `yaml:"startTime"`
-		} `yaml:"status"`
-	} `yaml:"items"`
-}
-
-type OPERATORS struct {
-	APIVersion string `yaml:"apiVersion"`
-	Items      []struct {
-		APIVersion string `yaml:"apiVersion"`
-		Kind       string `yaml:"kind"`
-		Metadata   struct {
-			Annotations struct {
-				ExcludeReleaseOpenshiftIoInternalOpenshiftHosted     string `yaml:"exclude.release.openshift.io/internal-openshift-hosted"`
-				IncludeReleaseOpenshiftIoSelfManagedHighAvailability string `yaml:"include.release.openshift.io/self-managed-high-availability"`
-			} `yaml:"annotations"`
-			CreationTimestamp time.Time `yaml:"creationTimestamp"`
-			Generation        int       `yaml:"generation"`
-			Name              string    `yaml:"name"`
-			ResourceVersion   string    `yaml:"resourceVersion"`
-			SelfLink          string    `yaml:"selfLink"`
-			UID               string    `yaml:"uid"`
-		} `yaml:"metadata"`
-		Spec struct {
-		} `yaml:"spec"`
-		Status struct {
-			Conditions []struct {
-				LastTransitionTime time.Time `yaml:"lastTransitionTime"`
-				Message            string    `yaml:"message"`
-				Reason             string    `yaml:"reason"`
-				Status             string    `yaml:"status"`
-				Type               string    `yaml:"type"`
-			} `yaml:"conditions"`
-			Extension      interface{} `yaml:"extension"`
-			RelatedObjects []struct {
-				Group     string `yaml:"group"`
-				Name      string `yaml:"name"`
-				Resource  string `yaml:"resource"`
-				Namespace string `yaml:"namespace,omitempty"`
-			} `yaml:"relatedObjects"`
-			Versions []struct {
-				Name    string `yaml:"name"`
-				Version string `yaml:"version"`
-			} `yaml:"versions"`
 		} `yaml:"status"`
 	} `yaml:"items"`
 }

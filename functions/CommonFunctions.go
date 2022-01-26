@@ -177,16 +177,16 @@ func GetAllMCPInfo(mcp_files []fs.FileInfo) {
 
 		}
 		machineCount := MyMCP.Status.MachineCount
-		machineCountS := fmt.Sprintf("%v", machineCount)
+		machineCountS := fmt.Sprint(machineCount)
 
 		machineReady := MyMCP.Status.ReadyMachineCount
-		machineReadyS := fmt.Sprintf("%v", machineReady)
+		machineReadyS := fmt.Sprint(machineReady)
 
 		machineUpdated := MyMCP.Status.UpdatedMachineCount
-		machineUpdatedS := fmt.Sprintf("%v", machineUpdated)
+		machineUpdatedS := fmt.Sprint(machineUpdated)
 
 		machineDegraded := MyMCP.Status.DegradedMachineCount
-		machineDegradedS := fmt.Sprintf("%v", machineDegraded)
+		machineDegradedS := fmt.Sprint(machineDegraded)
 
 		now := time.Now().UTC()
 		CreationTime := MyMCP.Metadata.CreationTimestamp

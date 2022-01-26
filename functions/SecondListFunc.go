@@ -3,6 +3,9 @@ package functions
 import (
 	"fmt"
 	"io/ioutil"
+
+	"github.com/ryanuber/columnize"
+	"gopkg.in/yaml.v2"
 )
 
 func SecondListOnSelect(index int, list_item_name string, second string, run rune) {
@@ -28,6 +31,50 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 		} else {
 			TextView.SetText(string(file))
 		}
+	} else if List1Item == "OCP Version" {
+		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
+		if List2Item == "YAML" {
+			TextView.SetText(string(File))
+			TextView.ScrollToBeginning()
+			TextViewData = FormatedOutput
+		} else if List2Item == "Cluster Update Details" {
+			Output = []string{}
+			//////////////////////
+			// Get cluster version
+			MyCV := CLUSTERVERSION{}
+			yaml.Unmarshal(File, &MyCV)
+			ClusterVersion := MyCV.Spec.DesiredUpdate.Version
+			UpgradeChannel := MyCV.Spec.Channel
+			ClusterID := MyCV.Spec.ClusterID
+			Output = append(Output, "Cluster desired version: "+Colors.Green+ClusterVersion+Colors.White)
+			Output = append(Output, "")
+			Output = append(Output, "Upgarde channel: "+Colors.Green+UpgradeChannel+Colors.White)
+			Output = append(Output, "")
+			Output = append(Output, "ClusterID: "+Colors.Green+ClusterID+Colors.White)
+			Output = append(Output, "")
+			Conditions := MyCV.Status.Conditions
+			for x := range Conditions {
+				if MyCV.Status.Conditions[x].Type == "Available" && MyCV.Status.Conditions[x].Status == "True" {
+					Output = append(Output, "Cluster update status: "+Colors.Green+"cluster is updated to "+ClusterVersion+Colors.White)
+					Output = append(Output, "")
+				} else if MyCV.Status.Conditions[x].Type == "Available" && MyCV.Status.Conditions[x].Status == "False" {
+					Output = append(Output, "Cluster update status: "+Colors.Red+"cluster is not fully updated to "+ClusterVersion+Colors.White)
+					Output = append(Output, "")
+				}
+			}
+			//////////////////////
+			// Get update path
+			Output = append(Output, "Upgrade Path:")
+			Output = append(Output, Colors.Yellow+"Version"+"|"+"Completion date/time"+Colors.White)
+			for x := len(MyCV.Status.History) - 1; x > -1; x-- {
+				Output = append(Output, Colors.White+MyCV.Status.History[x].Version+"|"+MyCV.Status.History[x].CompletionTime.String()+Colors.White)
+			}
+			FormatedOutput := columnize.SimpleFormat(Output)
+			TextView.SetText(FormatedOutput)
+			TextView.ScrollToBeginning()
+			TextViewData = FormatedOutput
+		}
+
 	} else if List1Item == "Projects" {
 		if List2Item == "All Projects" {
 			List3.Clear()

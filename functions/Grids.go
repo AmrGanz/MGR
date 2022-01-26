@@ -141,6 +141,7 @@ func CreateUI() {
 	List1.
 		ShowSecondaryText(false).
 		AddItem("Summary", "", 0, nil).
+		AddItem("OCP Version", "", 0, nil).
 		AddItem("Configurations", "", 0, nil).
 		AddItem("Projects", "", 0, nil).
 		AddItem("Nodes", "", 0, nil).

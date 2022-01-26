@@ -32,12 +32,156 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 	// Adding selection path to the ActivePathBox
 	ActivePathBox.SetText(List1Item + " -> ")
 	if list_item_name == "Summary" {
+		Output = []string{}
+		//////////////////////
 		// Get cluster version
 		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
 		MyCV := CLUSTERVERSION{}
 		yaml.Unmarshal(File, &MyCV)
 		ClusterVersion := MyCV.Spec.DesiredUpdate.Version
-		TextView.SetText("Clusterversion is:  " + Colors.Blue + ClusterVersion + Colors.White)
+		UpgradeChannel := MyCV.Spec.Channel
+		ClusterID := MyCV.Spec.ClusterID
+		Output = append(Output, "Cluster desired version: "+Colors.Green+ClusterVersion+Colors.White)
+		Output = append(Output, "")
+		Output = append(Output, "Upgarde channel: "+Colors.Green+UpgradeChannel+Colors.White)
+		Output = append(Output, "")
+		Output = append(Output, "ClusterID: "+Colors.Green+ClusterID+Colors.White)
+		Output = append(Output, "")
+		Conditions := MyCV.Status.Conditions
+		for x := range Conditions {
+			if MyCV.Status.Conditions[x].Type == "Available" && MyCV.Status.Conditions[x].Status == "True" {
+				Output = append(Output, "Cluster update status: "+Colors.Green+"cluster is updated to "+ClusterVersion+Colors.White)
+				Output = append(Output, "")
+			} else if MyCV.Status.Conditions[x].Type == "Available" && MyCV.Status.Conditions[x].Status == "False" {
+				Output = append(Output, "Cluster update status: "+Colors.Red+"cluster is not fully updated to "+ClusterVersion+Colors.White)
+				Output = append(Output, "")
+			}
+		}
+
+		//////////////////////
+		// Get update path
+		UpdatePath := ""
+		for x := len(MyCV.Status.History) - 1; x > -1; x-- {
+			if x > 0 {
+				UpdatePath = UpdatePath + MyCV.Status.History[x].Version + " -> "
+			} else {
+				UpdatePath = UpdatePath + MyCV.Status.History[x].Version
+			}
+
+		}
+		Output = append(Output, "Update Path: "+Colors.Green+UpdatePath+Colors.White)
+		Output = append(Output, "")
+
+		//////////////////////
+		// Get nodes status
+		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/core/nodes/")
+		NodeDownCount := 0
+		for i := range Files {
+			MyNode := NODE{}
+			File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + Files[i].Name())
+			yaml.Unmarshal(File, &MyNode)
+			conditions := MyNode.Status.Conditions
+			for i := 0; i < len(conditions); i++ {
+				if MyNode.Status.Conditions[i].Type == "Ready" {
+					if MyNode.Status.Conditions[i].Status != "True" {
+						NodeDownCount++
+					}
+				}
+			}
+		}
+		if NodeDownCount > 0 {
+			Output = append(Output, "Nodes status: "+Colors.Red+fmt.Sprint(NodeDownCount)+" cluster node(s) in a NotReady state"+Colors.White)
+			Output = append(Output, "")
+		} else {
+			Output = append(Output, "Nodes status: "+Colors.Green+"All of the cluster nodes are showing Ready state"+Colors.White)
+			Output = append(Output, "")
+		}
+
+		//////////////////////
+		// Get Operators status
+		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
+		MyOperators := OPERATORS{}
+		yaml.Unmarshal(File, &MyOperators)
+		OperatorsDownCount := 0
+		for i := range MyOperators.Items {
+			Conditions := MyOperators.Items[i].Status.Conditions
+			for x := range Conditions {
+				if MyOperators.Items[i].Status.Conditions[x].Type == "Degraded" && MyOperators.Items[i].Status.Conditions[x].Status == "True" {
+					OperatorsDownCount++
+					break
+				} else if MyOperators.Items[i].Status.Conditions[x].Type == "Progressing" && MyOperators.Items[i].Status.Conditions[x].Status == "True" {
+					OperatorsDownCount++
+					break
+				} else if MyOperators.Items[i].Status.Conditions[x].Type == "Available" && MyOperators.Items[i].Status.Conditions[x].Status == "False" {
+					OperatorsDownCount++
+					break
+				}
+			}
+		}
+		if OperatorsDownCount > 0 {
+			Output = append(Output, "Operators status: "+Colors.Red+fmt.Sprint(OperatorsDownCount)+" cluster operator(s) not fully Active"+Colors.White)
+			Output = append(Output, "")
+		} else {
+			Output = append(Output, "Operators status: "+Colors.Green+"All of the cluster operators are Active"+Colors.White)
+			Output = append(Output, "")
+		}
+		//////////////////////
+		// Get MCP status
+		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/")
+		MCPDownCount := 0
+		for i := range Files {
+			MyMCP := MCP{}
+			File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + Files[i].Name())
+			yaml.Unmarshal(File, &MyMCP)
+			Conditions := MyMCP.Status.Conditions
+			for x := range Conditions {
+				if MyMCP.Status.Conditions[x].Type == "Updated" && MyMCP.Status.Conditions[x].Status == "False" {
+					MCPDownCount++
+					break
+				} else if MyMCP.Status.Conditions[x].Type == "Updating" && MyMCP.Status.Conditions[x].Status == "True" {
+					MCPDownCount++
+					break
+				} else if MyMCP.Status.Conditions[x].Type == "Degraded" && MyMCP.Status.Conditions[x].Status == "True" {
+					MCPDownCount++
+					break
+				}
+			}
+		}
+		if MCPDownCount > 0 {
+			Output = append(Output, "Machine Config Pools Status: "+Colors.Red+fmt.Sprint(MCPDownCount)+" MCP(s) not fully Updated"+Colors.White)
+			Output = append(Output, "")
+		} else {
+			Output = append(Output, "Machine Config Pools Status: "+Colors.Green+"All MCPs are Updated"+Colors.White)
+			Output = append(Output, "")
+		}
+		//////////////////////
+		// Get Pending CSR count
+		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
+		PendingCSRCount := 0
+		for i := range Files {
+			var MyCSR = CSR{}
+			File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/" + Files[i].Name())
+			yaml.Unmarshal(File, &MyCSR)
+			if MyCSR.Status.Certificate == "" {
+				PendingCSRCount++
+			}
+		}
+		if PendingCSRCount > 0 {
+			Output = append(Output, "CSR status: "+Colors.Red+fmt.Sprint(PendingCSRCount)+" CSR(s) not approved yet"+Colors.White)
+			Output = append(Output, "")
+		} else {
+			Output = append(Output, "CSR status: "+Colors.Green+"All CSRs are Approved"+Colors.White)
+			Output = append(Output, "")
+		}
+
+		//////////////////////
+		// Get failed pods count
+
+		FormatedOutput := columnize.SimpleFormat(Output)
+		TextView.SetText(FormatedOutput)
+		TextView.ScrollToBeginning()
+		TextViewData = FormatedOutput
+
 	} else if list_item_name == "Configurations" {
 		List2.SetTitle("Cluster Configurations")
 		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/config.openshift.io/")
@@ -46,6 +190,16 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 				List2.AddItem(strings.Split(files[i].Name(), ".yaml")[0], "", 0, nil)
 			}
 		}
+
+	} else if list_item_name == "OCP Version" {
+		List2.SetTitle("Cluster Version Detail")
+		List2.
+			AddItem("YAML", "", 0, nil).
+			AddItem("Cluster Update Details", "", 0, nil)
+		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
+		TextView.SetText(string(File))
+		TextView.ScrollToBeginning()
+		TextViewData = FormatedOutput
 
 	} else if list_item_name == "Projects" {
 		List2.SetTitle("Projects")
