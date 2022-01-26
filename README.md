@@ -2,7 +2,7 @@
 MGR "_not the final name_" is a simple TUI interface to navigate and view OpenShift 4 must-gather files.
 
 # How to run it:
-- Download and run the executable file "mgr-v0.1":
+- Download and run the executable file "mgr-v0.x":
 ~~~
 # ./mgr <MG path>
 ~~~
