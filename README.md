@@ -26,7 +26,8 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 - The `SearchBox` is used to do a simple filtering of the `Text Output` and it is case sensitive
 - To retrive the original content, clean the `SearchBox` then press on the `Search Button`
 
-# A screenshot of the main interface showing an example output (the follwoing screenshot may not reflect the latest MGR version):
+# A screenshot of the main interface showing an example output:
+- Note: (the follwoing screenshot may not reflect the latest MGR version)
 ![Alt text](https://github.com/AmrGanz/MGR/blob/main/MainInterface.jpeg?raw=true)
 
 # Added Features:
