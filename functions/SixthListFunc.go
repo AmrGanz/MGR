@@ -16,9 +16,11 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 	List6Item = list_item_name
 	TextView.Clear()
 	ActivePathBox.SetText(List1Item + " -> " + List2Item + " -> " + List3Item + " -> " + List4Item + " -> " + List5Item + " -> " + List6Item)
-	if List1Item == "Projects" && List3Item == "Pods" && List6Item == "Logs" {
-		TextView.SetText("TBA")
-		TextView.ScrollToBeginning()
+	if List1Item == "Projects" && List3Item == "Pods" {
+		// Print Container's logs
+		File, _ := ioutil.ReadFile(Namespaces_Path + List2Item + "/pods/" + List4Item + "/" + List5Item + "/" + List5Item + "/logs/" + List6Item + ".log")
+		TextView.SetText(string(File))
+		TextViewData = string(File)
 	} else if List1Item == "Projects" && List3Item == "Deployment" && List6Item == "Info" {
 		// Get projects deployments "if exists"
 		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/deployments.yaml")

@@ -76,17 +76,17 @@ var CSR_Path = ""
 
 // Resources Paths
 func SetResourcesPath() {
-	Version_Path = MG_Path + "/cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml"
+	Version_Path = MG_Path + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml"
 	Configurations_Path = MG_Path + "cluster-scoped-resources/config.openshift.io/"
-	Namespaces_Path = MG_Path + "/namespaces/"
-	Nodes_Path = MG_Path + "/cluster-scoped-resources/core/nodes/"
-	Operators_Path = MG_Path + "/cluster-scoped-resources/config.openshift.io/clusteroperators.yaml"
+	Namespaces_Path = MG_Path + "namespaces/"
+	Nodes_Path = MG_Path + "cluster-scoped-resources/core/nodes/"
+	Operators_Path = MG_Path + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml"
 	InstalledOperators_Path = MG_Path + "/cluster-scoped-resources/operators.coreos.com/operators/"
-	InstallPlans = "/operators.coreos.com/installplans/" // not a typo as it is the appended part to a particular namespace path
-	MCP_Path = MG_Path + "/cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/"
-	MC_Path = MG_Path + "/cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/"
-	PV_Path = MG_Path + "/cluster-scoped-resources/core/persistentvolumes/"
-	CSR_Path = MG_Path + "/cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/"
+	InstallPlans = "operators.coreos.com/installplans/"
+	MCP_Path = MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/"
+	MC_Path = MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/"
+	PV_Path = MG_Path + "cluster-scoped-resources/core/persistentvolumes/"
+	CSR_Path = MG_Path + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/"
 }
 
 type NODE struct {

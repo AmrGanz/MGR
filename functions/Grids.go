@@ -52,7 +52,8 @@ func OnSearch() {
 		lines := strings.Split(TextViewData, "\n")
 		for i := 0; i < len(lines); i++ {
 			if strings.Contains(lines[i], searchitem) {
-				SearchResult = append(SearchResult, lines[i])
+				line := strings.Replace(lines[i], searchitem, Colors.Red+searchitem+Colors.White, -1)
+				SearchResult = append(SearchResult, line)
 			}
 		}
 		if len(SearchResult) > 0 {
@@ -150,7 +151,10 @@ func CreateUI() {
 	TextView.SetDoneFunc(TextViewOnExit)
 	TextView.
 		SetDynamicColors(true).
-		SetWordWrap(true)
+		// SetWordWrap(true).
+		SetChangedFunc(func() {
+			App.Draw()
+		})
 
 	// Setting SearchBox attributes
 	HelpButton.SetSelectedFunc(OnHelp)
