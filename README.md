@@ -30,6 +30,9 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 - Note: (the follwoing screenshot may not reflect the latest MGR version)
 ![Alt text](https://github.com/AmrGanz/MGR/blob/main/MainInterface.jpeg?raw=true)
 
+# Note:
+- If a container's log file is large enough it might take a few seconds to read it and display it in the Text View area.
+
 # Added Features:
 - Read Projects, Operators, Nodes, MCP, MC, and PersistentVolume resources details.
 - Text output is similar to what you get with the oc client
