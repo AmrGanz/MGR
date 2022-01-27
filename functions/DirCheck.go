@@ -26,7 +26,7 @@ func GetMGFiles() {
 				// Get must-gather image direcoty name and add it to the MGDropDown
 				for i := range MGFiles {
 					if MGFiles[i].IsDir() {
-						MGDropDown.AddOption(MGFiles[i].Name(), SetPath)
+						MGDropDown.AddOption(MGFiles[i].Name(), MGDropDownOnSelect)
 					}
 				}
 			}

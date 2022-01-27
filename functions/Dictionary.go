@@ -47,7 +47,7 @@ var width = 15
 var rows []int = []int{height, 20, 10, 0, height}
 var columns []int = []int{width, width, width, width, 0, width, width, width}
 var ProvidedDirPath = ""
-var BasePath = ""
+var MG_Path string
 
 var MyNode_Public = NODE{}
 var YamlFile []byte
@@ -61,6 +61,32 @@ var Colors struct {
 	Blue   string
 	Orange string
 	Filler string
+}
+var Version_Path = ""
+var Configurations_Path = ""
+var Namespaces_Path = ""
+var Nodes_Path = ""
+var Operators_Path = ""
+var InstalledOperators_Path = ""
+var InstallPlans = ""
+var MCP_Path = ""
+var MC_Path = ""
+var PV_Path = ""
+var CSR_Path = ""
+
+// Resources Paths
+func SetResourcesPath() {
+	Version_Path = MG_Path + "/cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml"
+	Configurations_Path = MG_Path + "cluster-scoped-resources/config.openshift.io/"
+	Namespaces_Path = MG_Path + "/namespaces/"
+	Nodes_Path = MG_Path + "/cluster-scoped-resources/core/nodes/"
+	Operators_Path = MG_Path + "/cluster-scoped-resources/config.openshift.io/clusteroperators.yaml"
+	InstalledOperators_Path = MG_Path + "/cluster-scoped-resources/operators.coreos.com/operators/"
+	InstallPlans = "/operators.coreos.com/installplans/" // not a typo as it is the appended part to a particular namespace path
+	MCP_Path = MG_Path + "/cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/"
+	MC_Path = MG_Path + "/cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/"
+	PV_Path = MG_Path + "/cluster-scoped-resources/core/persistentvolumes/"
+	CSR_Path = MG_Path + "/cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/"
 }
 
 type NODE struct {
@@ -220,41 +246,41 @@ type CSR struct {
 
 type OPERATOR struct {
 	APIVersion string `yaml:"apiVersion"`
-	Items      []struct {
-		APIVersion string `yaml:"apiVersion"`
-		Kind       string `yaml:"kind"`
-		Metadata   struct {
-			Annotations       map[string]string `yaml:"annotations"`
-			CreationTimestamp time.Time         `yaml:"creationTimestamp"`
-			Generation        int               `yaml:"generation"`
-			Name              string            `yaml:"name"`
-			ResourceVersion   string            `yaml:"resourceVersion"`
-			SelfLink          string            `yaml:"selfLink"`
-			UID               string            `yaml:"uid"`
-		} `yaml:"metadata"`
-		Spec struct {
-		} `yaml:"spec"`
-		Status struct {
-			Conditions []struct {
-				LastTransitionTime time.Time `yaml:"lastTransitionTime"`
-				Message            string    `yaml:"message"`
-				Reason             string    `yaml:"reason"`
-				Status             string    `yaml:"status"`
-				Type               string    `yaml:"type"`
-			} `yaml:"conditions"`
-			Extension      interface{} `yaml:"extension"`
-			RelatedObjects []struct {
-				Group     string `yaml:"group"`
+	Kind       string `yaml:"kind"`
+	Metadata   struct {
+		CreationTimestamp time.Time `yaml:"creationTimestamp"`
+		Generation        int       `yaml:"generation"`
+		Name              string    `yaml:"name"`
+		ResourceVersion   string    `yaml:"resourceVersion"`
+		SelfLink          string    `yaml:"selfLink"`
+		UID               string    `yaml:"uid"`
+	} `yaml:"metadata"`
+	Spec struct {
+	} `yaml:"spec"`
+	Status struct {
+		Components struct {
+			LabelSelector struct {
+				MatchExpressions []struct {
+					Key      string `yaml:"key"`
+					Operator string `yaml:"operator"`
+				} `yaml:"matchExpressions"`
+			} `yaml:"labelSelector"`
+			Refs []struct {
+				APIVersion string `yaml:"apiVersion"`
+				Conditions []struct {
+					LastTransitionTime time.Time `yaml:"lastTransitionTime"`
+					LastUpdateTime     time.Time `yaml:"lastUpdateTime"`
+					Message            string    `yaml:"message"`
+					Reason             string    `yaml:"reason"`
+					Status             string    `yaml:"status"`
+					Type               string    `yaml:"type"`
+				} `yaml:"conditions,omitempty"`
+				Kind      string `yaml:"kind"`
 				Name      string `yaml:"name"`
-				Resource  string `yaml:"resource"`
 				Namespace string `yaml:"namespace,omitempty"`
-			} `yaml:"relatedObjects"`
-			Versions []struct {
-				Name    string `yaml:"name"`
-				Version string `yaml:"version"`
-			} `yaml:"versions"`
-		} `yaml:"status"`
-	} `yaml:"items"`
+			} `yaml:"refs"`
+		} `yaml:"components"`
+	} `yaml:"status"`
 }
 
 type OPERATORS struct {
@@ -760,5 +786,67 @@ type MCP struct {
 		ReadyMachineCount       int `yaml:"readyMachineCount"`
 		UnavailableMachineCount int `yaml:"unavailableMachineCount"`
 		UpdatedMachineCount     int `yaml:"updatedMachineCount"`
+	} `yaml:"status"`
+}
+
+type INSTALLPLAN struct {
+	APIVersion string `yaml:"apiVersion"`
+	Kind       string `yaml:"kind"`
+	Metadata   struct {
+		CreationTimestamp time.Time `yaml:"creationTimestamp"`
+		GenerateName      string    `yaml:"generateName"`
+		Generation        int       `yaml:"generation"`
+		Name              string    `yaml:"name"`
+		Namespace         string    `yaml:"namespace"`
+		OwnerReferences   []struct {
+			APIVersion         string `yaml:"apiVersion"`
+			BlockOwnerDeletion bool   `yaml:"blockOwnerDeletion"`
+			Controller         bool   `yaml:"controller"`
+			Kind               string `yaml:"kind"`
+			Name               string `yaml:"name"`
+			UID                string `yaml:"uid"`
+		} `yaml:"ownerReferences"`
+		ResourceVersion string `yaml:"resourceVersion"`
+		SelfLink        string `yaml:"selfLink"`
+		UID             string `yaml:"uid"`
+	} `yaml:"metadata"`
+	Spec struct {
+		Approval                   string   `yaml:"approval"`
+		Approved                   bool     `yaml:"approved"`
+		ClusterServiceVersionNames []string `yaml:"clusterServiceVersionNames"`
+		Generation                 int      `yaml:"generation"`
+	} `yaml:"spec"`
+	Status struct {
+		BundleLookups []struct {
+			CatalogSourceRef struct {
+				Name      string `yaml:"name"`
+				Namespace string `yaml:"namespace"`
+			} `yaml:"catalogSourceRef"`
+			Identifier string `yaml:"identifier"`
+			Path       string `yaml:"path"`
+			Properties string `yaml:"properties"`
+			Replaces   string `yaml:"replaces"`
+		} `yaml:"bundleLookups"`
+		CatalogSources []interface{} `yaml:"catalogSources"`
+		Conditions     []struct {
+			LastTransitionTime time.Time `yaml:"lastTransitionTime"`
+			LastUpdateTime     time.Time `yaml:"lastUpdateTime"`
+			Status             string    `yaml:"status"`
+			Type               string    `yaml:"type"`
+		} `yaml:"conditions"`
+		Phase string `yaml:"phase"`
+		Plan  []struct {
+			Resolving string `yaml:"resolving"`
+			Resource  struct {
+				Group           string `yaml:"group"`
+				Kind            string `yaml:"kind"`
+				Manifest        string `yaml:"manifest"`
+				Name            string `yaml:"name"`
+				SourceName      string `yaml:"sourceName"`
+				SourceNamespace string `yaml:"sourceNamespace"`
+				Version         string `yaml:"version"`
+			} `yaml:"resource"`
+			Status string `yaml:"status"`
+		} `yaml:"plan"`
 	} `yaml:"status"`
 }

@@ -21,7 +21,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.ScrollToBeginning()
 	} else if List1Item == "Projects" && List3Item == "Deployment" && List6Item == "Info" {
 		// Get projects deployments "if exists"
-		yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/apps/deployments.yaml")
+		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/deployments.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -72,7 +72,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextView.SetText("No Deployment resources found")
 		}
 	} else if List1Item == "Projects" && List3Item == "Deployment" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/apps/deployments.yaml")
+		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/deployments.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -86,7 +86,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 	} else if List1Item == "Projects" && List3Item == "DeploymentConfig" && List6Item == "Info" {
 		// Get projects deploymentconfigs "if exists"
 		// Get projects deployments "if exists"
-		yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/apps.openshift.io/deploymentconfigs.yaml")
+		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps.openshift.io/deploymentconfigs.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -133,7 +133,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextView.SetText("No DeploymentConfig resources found")
 		}
 	} else if List1Item == "Projects" && List3Item == "DeploymentConfig" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/apps.openshift.io/deploymentconfigs.yaml")
+		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps.openshift.io/deploymentconfigs.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -146,7 +146,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.ScrollToBeginning()
 	} else if List1Item == "Projects" && List3Item == "Daemonset" && List6Item == "Info" {
 		// Get projects daemonsets "if exists"
-		yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/apps/daemonsets.yaml")
+		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/daemonsets.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -207,7 +207,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextView.SetText("No Daemonset resources found")
 		}
 	} else if List1Item == "Projects" && List3Item == "Daemonset" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/apps/daemonsets.yaml")
+		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/daemonsets.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -225,7 +225,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = ""
 		// Getting current timestamp
 		now := time.Now().UTC()
-		yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/services.yaml")
+		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/services.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -299,7 +299,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextViewData = FormatedOutput
 		}
 	} else if List1Item == "Projects" && List3Item == "Services" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/core/services.yaml")
+		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/services.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -319,7 +319,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		// Getting current timestamp
 		now := time.Now().UTC()
 		Output = []string{"NAME" + "|" + "HOST/PORT" + "|" + "PATH" + "|" + "SERVICES" + "|" + "PORT" + "|" + "TERMINATION" + "|" + "WILDCARD" + "|" + "AGE" + "\n"}
-		yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/route.openshift.io/routes.yaml")
+		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/route.openshift.io/routes.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -382,7 +382,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 
 		}
 	} else if List1Item == "Projects" && List3Item == "Routes" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/route.openshift.io/routes.yaml")
+		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/route.openshift.io/routes.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -402,7 +402,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		// Getting current timestamp
 		now := time.Now().UTC()
 		Output = []string{"NAMESPACE" + "|" + "NAME" + "|" + "TAGS" + "|" + "AGE 	" + "\n"}
-		yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/image.openshift.io/imagestreams.yaml")
+		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/image.openshift.io/imagestreams.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -453,7 +453,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextViewData = FormatedOutput
 		}
 	} else if List1Item == "Projects" && List3Item == "Image Stream" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/image.openshift.io/imagestreams.yaml")
+		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/image.openshift.io/imagestreams.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -471,12 +471,12 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = ""
 		// Getting current timestamp
 		now := time.Now().UTC()
-		namespaces, _ := ioutil.ReadDir(BasePath + "namespaces/")
+		namespaces, _ := ioutil.ReadDir(MG_Path + "namespaces/")
 		if len(namespaces) > 0 {
 			Output = []string{"NAMESPACE" + "|" + "NAME" + "|" + "STATUS" + "|" + "VOLUME" + "|" + "CAPACITY" + "|" + "ACCESS MODES" + "|" + "STORAGECLASS" + "|" + "AGE" + "\n"}
 			for projectIndex := 0; projectIndex < len(namespaces); projectIndex++ {
-				if _, err := os.Stat(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/core/persistentvolumeclaims.yaml"); err == nil {
-					yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + namespaces[projectIndex].Name() + "/core/persistentvolumeclaims.yaml")
+				if _, err := os.Stat(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/core/persistentvolumeclaims.yaml"); err == nil {
+					yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/core/persistentvolumeclaims.yaml")
 					m := make(map[interface{}]interface{})
 					yaml.Unmarshal(yfile, m)
 					x, _ := m["items"].([]interface{})
@@ -533,7 +533,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			}
 		}
 	} else if List1Item == "Projects" && List3Item == "PVC" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/core/persistentvolumeclaims.yaml")
+		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/persistentvolumeclaims.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -553,7 +553,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		// Getting current timestamp
 		now := time.Now().UTC()
 		Output := []string{"NAME" + "|" + "DATA" + "|" + "AGE" + "\n"}
-		yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/configmaps.yaml")
+		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/configmaps.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -600,7 +600,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 
 		}
 	} else if List1Item == "Projects" && List3Item == "ConfigMap" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/core/configmaps.yaml")
+		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/configmaps.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -621,7 +621,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		// Getting current timestamp
 		now := time.Now().UTC()
 		Output := []string{"NAME" + "|" + "TYPE" + "|" + "DATA" + "|" + "AGE" + "\n"}
-		yfile, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/core/secrets.yaml")
+		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/secrets.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -672,7 +672,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 
 		}
 	} else if List1Item == "Projects" && List3Item == "Secrets" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/core/secrets.yaml")
+		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/secrets.yaml")
 		m := make(map[interface{}]interface{})
 		yaml.Unmarshal(yfile, m)
 		x, _ := m["items"].([]interface{})
@@ -686,7 +686,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 	} else if List1Item == "Projects" && List3Item == "Subscriptions" && List6Item == "Info" {
 		//TBA
 	} else if List1Item == "Projects" && List3Item == "Supscriptions" && List6Item == "YAML" {
-		// yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/apps/deployments.yaml")
+		// yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/deployments.yaml")
 		// m := make(map[interface{}]interface{})
 		// yaml.Unmarshal(yfile, m)
 		// x, _ := m["items"].([]interface{})
@@ -701,7 +701,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 	} else if List1Item == "Projects" && List3Item == "Operators" && List6Item == "Info" {
 
 	} else if List1Item == "Projects" && List3Item == "Operators" && List6Item == "YAML" {
-		// yfile, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/apps/deployments.yaml")
+		// yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/deployments.yaml")
 		// m := make(map[interface{}]interface{})
 		// yaml.Unmarshal(yfile, m)
 		// x, _ := m["items"].([]interface{})

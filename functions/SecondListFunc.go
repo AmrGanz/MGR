@@ -25,14 +25,14 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 	List2Item = list_item_name
 	ActivePathBox.SetText(List1Item + " -> " + List2Item)
 	if List1Item == "Configurations" {
-		file, err := ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/" + List2Item + ".yaml")
+		file, err := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/config.openshift.io/" + List2Item + ".yaml")
 		if err != nil {
 			fmt.Print(err)
 		} else {
 			TextView.SetText(string(file))
 		}
 	} else if List1Item == "OCP Version" {
-		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
+		File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
 		if List2Item == "YAML" {
 			TextView.SetText(string(File))
 			TextView.ScrollToBeginning()
@@ -94,7 +94,8 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 				AddItem("ConfigMap", "", 0, nil).
 				AddItem("Secrets", "", 0, nil).
 				AddItem("Subscriptions", "", 0, nil).
-				AddItem("Operators", "", 0, nil)
+				AddItem("Operators", "", 0, nil).
+				AddItem("Install Plans", "", 0, nil)
 		} else if List2Item == "Empty" {
 			// Do nothing
 		} else {
@@ -113,7 +114,8 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 				AddItem("ConfigMap", "", 0, nil).
 				AddItem("Secrets", "", 0, nil).
 				AddItem("Subscriptions", "", 0, nil).
-				AddItem("Operators", "", 0, nil)
+				AddItem("Operators", "", 0, nil).
+				AddItem("Install Plans", "", 0, nil)
 		}
 	} else if List1Item == "Nodes" {
 		if List2Item == "Nodes Summary" {
@@ -130,6 +132,11 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 				AddItem("YAML", "", 0, nil)
 		}
 	} else if List1Item == "Operators" {
+		List3.SetTitle("Info")
+		List3.
+			AddItem("YAML", "", 0, nil).
+			AddItem("Summary", "", 0, nil)
+	} else if List1Item == "Installed Operators" {
 		List3.SetTitle("Info")
 		List3.
 			AddItem("YAML", "", 0, nil).
@@ -154,7 +161,7 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 		if List2Item == "All Certificate Signing Requests" {
 			GetCSRInfo()
 		} else {
-			File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/" + List2Item + ".yaml")
+			File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/" + List2Item + ".yaml")
 			TextView.SetText(string(File))
 			TextView.ScrollToBeginning()
 			TextViewData = TextView.GetText(false)

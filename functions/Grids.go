@@ -10,8 +10,11 @@ import (
 	"github.com/rivo/tview"
 )
 
-func MGDropDownOnSelect(text string, index int) {
+func MGDropDownOnSelect() {
 	if _, value := MGDropDown.GetCurrentOption(); value != "" {
+		_, SelectedMGType := MGDropDown.GetCurrentOption()
+		MG_Path = ProvidedDirPath + SelectedMGType + "/"
+		SetResourcesPath()
 		List1.Clear()
 		List1.
 			ShowSecondaryText(false).
@@ -21,6 +24,7 @@ func MGDropDownOnSelect(text string, index int) {
 			AddItem("Projects", "", 0, nil).
 			AddItem("Nodes", "", 0, nil).
 			AddItem("Operators", "", 0, nil).
+			AddItem("Installed Operators", "", 0, nil).
 			AddItem("MCP", "", 0, nil).
 			AddItem("MC", "", 0, nil).
 			AddItem("PV", "", 0, nil).
@@ -117,7 +121,7 @@ func TextViewOnFocus(action tview.MouseAction, event *tcell.EventMouse) {
 
 func SetPath() {
 	_, SelectedMGType := MGDropDown.GetCurrentOption()
-	BasePath = ProvidedDirPath + SelectedMGType + "/"
+	MG_Path = ProvidedDirPath + SelectedMGType + "/"
 }
 
 func CreateUI() {
@@ -152,7 +156,7 @@ func CreateUI() {
 	HelpButton.SetSelectedFunc(OnHelp)
 
 	// Set MGdropDown On Select Function
-	MGDropDown.SetSelectedFunc(MGDropDownOnSelect)
+	// MGDropDown.SetSelectedFunc(MGDropDownOnSelect)
 
 	// inittializing the List1 widget with common attributes
 	List1.

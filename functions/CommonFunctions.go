@@ -17,7 +17,7 @@ func GetNodesInfo(NodeName string, Flag string) {
 	TextView.Clear()
 	TextViewData = ""
 	if NodeName == "All Nodes" {
-		Files, Err = ioutil.ReadDir(BasePath + "cluster-scoped-resources/core/nodes/")
+		Files, Err = ioutil.ReadDir(MG_Path + "cluster-scoped-resources/core/nodes/")
 		if Err != nil {
 			TextView.SetText(Err.Error())
 		} else {
@@ -56,7 +56,7 @@ func GetNodesInfo(NodeName string, Flag string) {
 func ReadNodeYaml(NodeFileName string, Flag string) {
 	var MyNode = NODE{}
 	now := time.Now().UTC()
-	File, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + NodeFileName)
+	File, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/core/nodes/" + NodeFileName)
 
 	yaml.Unmarshal(File, &MyNode)
 	MyNode_Public = MyNode
@@ -159,7 +159,7 @@ func GetAllMCPInfo(mcp_files []fs.FileInfo) {
 	Output := []string{Colors.Yellow + "NAME" + "|" + "CONFIG" + "|" + Colors.Yellow + "UPDATED" + Colors.Yellow + "|" + Colors.Yellow + "UPDATING" + Colors.Yellow + "|" + Colors.Yellow + "DEGRADED" + Colors.Yellow + "|" + "MACHINECOUNT" + "|" + "READYMACHINECOUNT" + "|" + "UPDATEDMACHINECOUNT" + "|" + "DEGRADEDMACHINECOUNT" + "|" + "AGE" + Colors.White}
 
 	for _, mcp := range Files {
-		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + mcp.Name())
+		File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + mcp.Name())
 
 		MyMCP := MCP{}
 		yaml.Unmarshal(File, &MyMCP)
@@ -239,7 +239,7 @@ func GetMCPInfo(mcp_file []byte) {
 	TextViewData = ""
 	Output := []string{Colors.Yellow + "NAME" + "|" + "CONFIG" + "|" + Colors.Yellow + "UPDATED" + Colors.Yellow + "|" + Colors.Yellow + "UPDATING" + Colors.Yellow + "|" + Colors.Yellow + "DEGRADED" + Colors.Yellow + "|" + "MACHINECOUNT" + "|" + "READYMACHINECOUNT" + "|" + "UPDATEDMACHINECOUNT" + "|" + "DEGRADEDMACHINECOUNT" + "|" + "AGE" + Colors.White}
 
-	File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + List2Item + ".yaml")
+	File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + List2Item + ".yaml")
 
 	MyMCP := MCP{}
 	yaml.Unmarshal(File, &MyMCP)
@@ -313,14 +313,14 @@ func GetMCPInfo(mcp_file []byte) {
 
 func GetCSRInfo() {
 	now := time.Now().UTC()
-	Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
+	Files, _ = ioutil.ReadDir(MG_Path + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
 	Output := []string{Colors.Yellow + "NAME" + "|" + "AGE" + "|" + "SIGNERNAME" + "|" + "REQUESTOR" + "|" + "CONDITION" + Colors.White}
 	if len(Files) == 0 {
 		TextView.SetText("No available data about CSR")
 	} else {
 		for _, File := range Files {
 			var MyCSR = CSR{}
-			yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/" + File.Name())
+			yfile, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/" + File.Name())
 			yaml.Unmarshal(yfile, &MyCSR)
 
 			name := MyCSR.Metadata.Name
@@ -357,4 +357,27 @@ func GetCSRInfo() {
 		TextView.ScrollToBeginning()
 		TextViewData = FormatedOutput
 	}
+}
+
+func GetInstallPlan() {
+
+}
+
+func GetAge(CreationTime time.Time) string {
+	now := time.Now().UTC()
+	diff := now.Sub(CreationTime).Seconds()
+	diffInt := int(diff)
+	seconds := strconv.Itoa((diffInt % 60))
+	minutes := strconv.Itoa((diffInt / 60) % 60)
+	hours := strconv.Itoa((diffInt / 360) % 24)
+	days := strconv.Itoa((diffInt / 86400))
+	age := ""
+	if days != "0" {
+		age = days + "d" + hours + "h"
+	} else if days == "0" && hours != "" {
+		age = hours + "h" + minutes + "m"
+	} else if hours == "0" {
+		age = minutes + "m" + seconds + "s"
+	}
+	return age
 }

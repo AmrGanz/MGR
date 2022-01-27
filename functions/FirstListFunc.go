@@ -35,7 +35,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		Output = []string{}
 		//////////////////////
 		// Get cluster version
-		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
+		File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
 		MyCV := CLUSTERVERSION{}
 		yaml.Unmarshal(File, &MyCV)
 		ClusterVersion := MyCV.Spec.DesiredUpdate.Version
@@ -74,11 +74,11 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 
 		//////////////////////
 		// Get nodes status
-		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/core/nodes/")
+		Files, _ = ioutil.ReadDir(MG_Path + "cluster-scoped-resources/core/nodes/")
 		NodeDownCount := 0
 		for i := range Files {
 			MyNode := NODE{}
-			File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/nodes/" + Files[i].Name())
+			File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/core/nodes/" + Files[i].Name())
 			yaml.Unmarshal(File, &MyNode)
 			conditions := MyNode.Status.Conditions
 			for i := 0; i < len(conditions); i++ {
@@ -99,7 +99,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 
 		//////////////////////
 		// Get Operators status
-		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
+		File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
 		MyOperators := OPERATORS{}
 		yaml.Unmarshal(File, &MyOperators)
 		OperatorsDownCount := 0
@@ -127,11 +127,11 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		}
 		//////////////////////
 		// Get MCP status
-		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/")
+		Files, _ = ioutil.ReadDir(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/")
 		MCPDownCount := 0
 		for i := range Files {
 			MyMCP := MCP{}
-			File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + Files[i].Name())
+			File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/" + Files[i].Name())
 			yaml.Unmarshal(File, &MyMCP)
 			Conditions := MyMCP.Status.Conditions
 			for x := range Conditions {
@@ -156,11 +156,11 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		}
 		//////////////////////
 		// Get Pending CSR count
-		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
+		Files, _ = ioutil.ReadDir(MG_Path + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
 		PendingCSRCount := 0
 		for i := range Files {
 			var MyCSR = CSR{}
-			File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/" + Files[i].Name())
+			File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/" + Files[i].Name())
 			yaml.Unmarshal(File, &MyCSR)
 			if MyCSR.Status.Certificate == "" {
 				PendingCSRCount++
@@ -184,7 +184,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 
 	} else if list_item_name == "Configurations" {
 		List2.SetTitle("Cluster Configurations")
-		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/config.openshift.io/")
+		files, _ := ioutil.ReadDir(MG_Path + "cluster-scoped-resources/config.openshift.io/")
 		for i := range files {
 			if !files[i].IsDir() {
 				List2.AddItem(strings.Split(files[i].Name(), ".yaml")[0], "", 0, nil)
@@ -196,14 +196,14 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		List2.
 			AddItem("YAML", "", 0, nil).
 			AddItem("Cluster Update Details", "", 0, nil)
-		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
+		File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
 		TextView.SetText(string(File))
 		TextView.ScrollToBeginning()
 		TextViewData = FormatedOutput
 
 	} else if list_item_name == "Projects" {
 		List2.SetTitle("Projects")
-		namespaces, _ := ioutil.ReadDir(BasePath + "namespaces/")
+		namespaces, _ := ioutil.ReadDir(MG_Path + "namespaces/")
 		if len(namespaces) > 0 {
 			List2.AddItem("All Projects", "", 0, nil)
 			for _, project := range namespaces {
@@ -217,7 +217,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
-		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/core/nodes/")
+		files, _ := ioutil.ReadDir(MG_Path + "cluster-scoped-resources/core/nodes/")
 		List2.
 			AddItem("Nodes Summary", "", 0, nil).
 			AddItem("Nodes Details", "", 0, nil).
@@ -231,12 +231,12 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 	} else if list_item_name == "Operators" {
 		List2.SetTitle("Operators")
 		// Get cluster version
-		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
+		File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/config.openshift.io/clusterversions/version.yaml")
 		MyCV := CLUSTERVERSION{}
 		yaml.Unmarshal(File, &MyCV)
 		ClusterVersion := MyCV.Spec.DesiredUpdate.Version
 
-		File, _ = ioutil.ReadFile(BasePath + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
+		File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
 		Output := []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "VERSION" + Colors.Yellow + "|" + Colors.Yellow + "AVAILABLE" + Colors.Yellow + "|" + Colors.Yellow + "PROGRESSING" + Colors.Yellow + "|" + Colors.Yellow + "DEGRADED" + Colors.Yellow + "|" + "SINCE" + Colors.White}
 		MyOperators := OPERATORS{}
 		// m := make(map[interface{}]interface{})
@@ -311,12 +311,32 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.SetText(FormatedOutput)
 		TextView.ScrollToBeginning()
 		TextViewData = FormatedOutput
+	} else if list_item_name == "Installed Operators" {
+		TextView.Clear()
+		TextViewData = ""
+		List2.SetTitle("Installed Operators")
+		// Get installed operators file
+		Output = []string{Colors.Yellow + "NAME" + "|" + "AGE" + Colors.White}
+		Files, _ = ioutil.ReadDir(InstalledOperators_Path)
+		for i := range Files {
+			List2.AddItem(strings.Split(Files[i].Name(), ".yaml")[0], "", 0, nil)
+			File, _ = ioutil.ReadFile(InstalledOperators_Path + Files[i].Name())
+			MyOperator := OPERATOR{}
+			yaml.Unmarshal(File, &MyOperator)
+			name := MyOperator.Metadata.Name
+			age := GetAge(MyOperator.Metadata.CreationTimestamp)
+			Output = append(Output, Colors.White+name+"|"+age+Colors.White)
+		}
+		FormatedOutput := columnize.SimpleFormat(Output)
+		TextView.SetText(FormatedOutput)
+		TextView.ScrollToBeginning()
+		TextViewData = FormatedOutput
 	} else if list_item_name == "MCP" {
 		List2.SetTitle("MCP")
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
-		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/")
+		Files, _ = ioutil.ReadDir(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigpools/")
 		GetAllMCPInfo(Files)
 
 	} else if list_item_name == "MC" {
@@ -326,9 +346,9 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = ""
 		now := time.Now().UTC()
 		Output := []string{Colors.Yellow + "NAME" + "|" + "GENERATEDBYCONTROLLER" + "|" + "IGNITIONVERSION" + "|" + "AGE" + Colors.White + "\n"}
-		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/")
+		files, _ := ioutil.ReadDir(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/")
 		for _, file := range files {
-			yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + file.Name())
+			yfile, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + file.Name())
 
 			m := make(map[string]interface{})
 			yaml.Unmarshal(yfile, m)
@@ -375,9 +395,9 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = ""
 		now := time.Now().UTC()
 		Output := []string{Colors.Yellow + "NAME" + "|" + "CAPACITY" + "|" + "ACCESS MODE" + "|" + "RECLAIM POLICY" + "|" + "STATUS" + "|" + "CLAIM" + "|" + "STORAGECLASS" + "|" + "AGE" + Colors.White}
-		files, _ := ioutil.ReadDir(BasePath + "cluster-scoped-resources/core/persistentvolumes/")
+		files, _ := ioutil.ReadDir(MG_Path + "cluster-scoped-resources/core/persistentvolumes/")
 		for _, file := range files {
-			yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/core/persistentvolumes/" + file.Name())
+			yfile, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/core/persistentvolumes/" + file.Name())
 
 			m := make(map[string]interface{})
 			yaml.Unmarshal(yfile, m)
@@ -434,7 +454,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
 		TextViewData = ""
-		Files, _ = ioutil.ReadDir(BasePath + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
+		Files, _ = ioutil.ReadDir(MG_Path + "cluster-scoped-resources/certificates.k8s.io/certificatesigningrequests/")
 		List2.SetTitle("CSR")
 		GetCSRInfo()
 		List2.AddItem("All Certificate Signing Requests", "", 0, nil)

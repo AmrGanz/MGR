@@ -26,7 +26,7 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 			// Add pod's containers to the Fifth list
 			List5.Clear()
 			List5.SetTitle("Containers")
-			filesList, _ := ioutil.ReadDir(BasePath + "namespaces/" + List2Item + "/pods/" + List4Item)
+			filesList, _ := ioutil.ReadDir(MG_Path + "namespaces/" + List2Item + "/pods/" + List4Item)
 			if len(filesList) > 0 {
 				for _, file := range filesList {
 					if file.IsDir() {
@@ -37,7 +37,7 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 				List5.AddItem("Empty", "", 0, nil)
 			}
 			// Print Pod's YAML definition
-			content, _ := os.ReadFile(BasePath + "namespaces/" + List2Item + "/pods/" + List4Item + "/" + List4Item + ".yaml")
+			content, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/pods/" + List4Item + "/" + List4Item + ".yaml")
 			TextView.SetText(string(content))
 			TextView.ScrollToBeginning()
 			TextViewData = TextView.GetText(false)
@@ -91,22 +91,30 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 			// Cleaning TextView and TextViewData
 			TextView.Clear()
 			TextViewData = ""
-			file, _ := ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/operators.coreos.com/subscriptions/" + List4Item + ".yaml")
+			file, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/operators.coreos.com/subscriptions/" + List4Item + ".yaml")
 
 			TextView.SetText(string(file))
 			TextView.ScrollToBeginning()
 			TextViewData = FormatedOutput
 		} else if List3Item == "Operators" {
-			YamlFile, Err = ioutil.ReadFile(BasePath + "namespaces/" + List2Item + "/operators.coreos.com/clusterserviceversions/" + List4Item + ".yaml")
+			YamlFile, Err = ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/operators.coreos.com/clusterserviceversions/" + List4Item + ".yaml")
 			TextView.SetText(string(YamlFile))
 			TextViewData = TextView.GetText(false)
 			TextView.ScrollToBeginning()
+		} else if List3Item == "Install Plans" {
+			// Cleaning TextView and TextViewData
+			TextView.Clear()
+			TextViewData = ""
+			File, _ := ioutil.ReadFile(Namespaces_Path + List2Item + InstallPlans + List4Item + ".yaml")
+			TextView.SetText(string(File))
+			TextView.ScrollToBeginning()
+			TextViewData = FormatedOutput
 		}
 	} else if List1Item == "MC" && List3Item == "Data" {
 		TextView.Clear()
 		TextViewData = ""
 
-		yfile, _ := ioutil.ReadFile(BasePath + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + List2Item + ".yaml")
+		yfile, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + List2Item + ".yaml")
 
 		m := make(map[string]interface{})
 		yaml.Unmarshal(yfile, m)
