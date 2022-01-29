@@ -13,7 +13,7 @@ func GetMGFiles() {
 		// Check if user procided an argument [should be the MG directory]
 		fmt.Print("Please provide the must-gather directory while runnnig this tool" + "\n")
 	} else {
-		ProvidedDirPath = os.Args[1]
+		ProvidedDirPath = os.Args[1] + "/"
 		// Try to open the provided directory
 		_, err := os.Open(ProvidedDirPath)
 		if err != nil {

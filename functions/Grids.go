@@ -11,24 +11,65 @@ import (
 )
 
 func MGDropDownOnSelect() {
+	TextView.Clear()
+	List1.Clear()
+	List2.Clear()
+	List3.Clear()
+	List4.Clear()
+	List5.Clear()
+	List6.Clear()
+	TextViewData = ""
+	IsMGDir := 0
 	if _, value := MGDropDown.GetCurrentOption(); value != "" {
 		_, SelectedMGType := MGDropDown.GetCurrentOption()
 		MG_Path = ProvidedDirPath + SelectedMGType + "/"
-		SetResourcesPath()
-		List1.Clear()
-		List1.
-			ShowSecondaryText(false).
-			AddItem("Summary", "", 0, nil).
-			AddItem("OCP Version", "", 0, nil).
-			AddItem("Configurations", "", 0, nil).
-			AddItem("Projects", "", 0, nil).
-			AddItem("Nodes", "", 0, nil).
-			AddItem("Operators", "", 0, nil).
-			AddItem("Installed Operators", "", 0, nil).
-			AddItem("MCP", "", 0, nil).
-			AddItem("MC", "", 0, nil).
-			AddItem("PV", "", 0, nil).
-			AddItem("CSR", "", 0, nil)
+		Files, _ = ioutil.ReadDir(MG_Path)
+		for i := range Files {
+			if Files[i].Name() == "namespaces" {
+				IsMGDir++
+			} else if Files[i].Name() == "cluster-scoped-resources" {
+				IsMGDir++
+			}
+		}
+		if IsMGDir > 1 {
+			// Initialize resource Dir/File paths after getting MG_Path value
+			SetResourcesPath()
+			IsItClusterLoggingMG := "false"
+			Files, _ = ioutil.ReadDir(MG_Path)
+			for i := range Files {
+				if Files[i].Name() == "cluster-logging" {
+					IsItClusterLoggingMG = "true"
+				}
+			}
+			if IsItClusterLoggingMG == "true" {
+				List1.
+					ShowSecondaryText(false).
+					AddItem("Summary", "", 0, nil).
+					AddItem("Projects", "", 0, nil).
+					AddItem("Nodes", "", 0, nil).
+					AddItem("PV", "", 0, nil).
+					AddItem(Colors.Yellow+"Logging"+Colors.White, "", 0, nil)
+
+			} else {
+				List1.
+					ShowSecondaryText(false).
+					AddItem("Summary", "", 0, nil).
+					AddItem("OCP Version", "", 0, nil).
+					AddItem("Configurations", "", 0, nil).
+					AddItem("Projects", "", 0, nil).
+					AddItem("Nodes", "", 0, nil).
+					AddItem("Operators", "", 0, nil).
+					AddItem("Installed Operators", "", 0, nil).
+					AddItem("MCP", "", 0, nil).
+					AddItem("MC", "", 0, nil).
+					AddItem("PV", "", 0, nil).
+					AddItem("CSR", "", 0, nil)
+			}
+
+		} else {
+			TextView.SetText(Colors.Red + "Please make sure you have selected the correct MG Dir." + "\n\n" + "Click on the Help Buttion to get more details." + Colors.White)
+		}
+
 	}
 }
 
@@ -155,6 +196,9 @@ func CreateUI() {
 		SetChangedFunc(func() {
 			App.Draw()
 		})
+
+	// Setting ActivePathBox attributes
+	ActivePathBox.SetDynamicColors(true)
 
 	// Setting SearchBox attributes
 	HelpButton.SetSelectedFunc(OnHelp)
