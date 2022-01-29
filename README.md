@@ -12,7 +12,7 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 # cd MGR
 # go mod init mgr
 # go mod tidy
-# go build . -o mgr
+# go build -o mgr
 # ./mgr <MG path>
 ~~~
 - The main interface is devided into multiple areas as shown in the following screenshot (the follwoing screenshot may not reflect the latest MGR version):
