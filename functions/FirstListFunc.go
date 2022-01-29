@@ -480,5 +480,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		for _, File := range Files {
 			List2.AddItem(strings.Split(File.Name(), ".yaml")[0], "", 0, nil)
 		}
+	} else if list_item_name == Colors.Yellow+"Logging"+Colors.White {
+		TextView.SetText("TBA")
 	}
 }
