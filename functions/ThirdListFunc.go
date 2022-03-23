@@ -45,7 +45,6 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 					// Get project's pods "regardless of it's type/status" I can add the owner column if possible
 					if _, err := os.Stat(MG_Path + "namespaces/" + Files[projectIndex].Name() + "/core/pods.yaml"); err == nil {
 						File, _ = ioutil.ReadFile(MG_Path + "namespaces/" + Files[projectIndex].Name() + "/core/pods.yaml")
-						// m := make(map[interface{}]interface{})
 						MyPods := PODS{}
 						yaml.Unmarshal(File, &MyPods)
 						items := MyPods.Items
@@ -109,27 +108,29 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			TextViewData = ""
 			// Getting current timestamp
 			now := time.Now().UTC()
-			namespaces, _ := ioutil.ReadDir(MG_Path + "namespaces/")
+			namespaces, _ := ioutil.ReadDir(Namespaces_Path)
 			if len(namespaces) > 0 {
 				Output = []string{Colors.Yellow + "NAMESPACE" + "|" + "NAME" + "|" + "READY" + "|" + "UP-TO-DATE" + "|" + "AVAILABLE" + "|" + "AGE" + Colors.White}
 				for projectIndex := 0; projectIndex < len(namespaces); projectIndex++ {
-					if _, err := os.Stat(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/apps/deployments.yaml"); err == nil {
-						yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/apps/deployments.yaml")
-						m := make(map[interface{}]interface{})
-						yaml.Unmarshal(yfile, m)
-						items, _ := m["items"].([]interface{})
+					if _, err := os.Stat(Namespaces_Path + namespaces[projectIndex].Name() + "/apps/deployments.yaml"); err == nil {
+						File, _ = ioutil.ReadFile(Namespaces_Path + namespaces[projectIndex].Name() + "/apps/deployments.yaml")
+						MyDeployment := DEPLOYMENT{}
+						yaml.Unmarshal(File, &MyDeployment)
+
+						items := MyDeployment.Items
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
-								y := items[i].(map[interface{}]interface{})
-								name := y["metadata"].(map[interface{}]interface{})["name"]
-								nameS := fmt.Sprintf("%v", name)
-								ready := y["status"].(map[interface{}]interface{})["readyReplicas"]
-								readyS := fmt.Sprintf("%v", ready)
+								Deployment := MyDeployment.Items[i]
+								name := Deployment.Metadata.Name
+
+								ready := strconv.Itoa(Deployment.Status.ReadyReplicas)
+
 								UpToDate := "TBA"
+
 								// I think I should print Ready/Avilable just like in the output of [# oc get deployment]
-								available := y["status"].(map[interface{}]interface{})["availableReplicas"]
-								availableS := fmt.Sprintf("%v", available)
-								CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+								available := strconv.Itoa(Deployment.Status.AvailableReplicas)
+
+								CreationTime := Deployment.Metadata.CreationTimestamp
 								CreationTimeS := fmt.Sprintf("%v", CreationTime)
 								t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 								diff := now.Sub(t1).Seconds()
@@ -146,7 +147,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 								} else if hours == "0" {
 									age = minutes + "m" + seconds + "s"
 								}
-								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+readyS+"|"+UpToDate+"|"+availableS+"|"+age+Colors.White)
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+name+"|"+ready+"|"+UpToDate+"|"+available+"|"+age+Colors.White)
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -165,37 +166,35 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			TextViewData = ""
 			// Getting current timestamp
 			now := time.Now().UTC()
-			namespaces, _ := ioutil.ReadDir(MG_Path + "namespaces/")
+			namespaces, _ := ioutil.ReadDir(Namespaces_Path)
 			if len(namespaces) > 0 {
 				Output = []string{Colors.Yellow + "NAMESPACE" + "|" + "NAME" + "|" + "READY" + "|" + "UP-TO-DATE" + "|" + "AVAILABLE" + "|" + "AGE" + Colors.White}
 				for projectIndex := 0; projectIndex < len(namespaces); projectIndex++ {
-					if _, err := os.Stat(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/apps.openshift.io/deploymentconfigs.yaml"); err == nil {
-						yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/apps.openshift.io/deploymentconfigs.yaml")
-						m := make(map[interface{}]interface{})
-						yaml.Unmarshal(yfile, m)
-						items, _ := m["items"].([]interface{})
+					if _, err := os.Stat(Namespaces_Path + namespaces[projectIndex].Name() + "/apps.openshift.io/deploymentconfigs.yaml"); err == nil {
+						File, _ = ioutil.ReadFile(Namespaces_Path + namespaces[projectIndex].Name() + "/apps.openshift.io/deploymentconfigs.yaml")
+
+						MyDeploymentconfig := DEPLOYMENTCONFIG{}
+						yaml.Unmarshal(File, &MyDeploymentconfig)
+
+						items := MyDeploymentconfig.Items
 						if len(items) > 0 {
 							Output = []string{Colors.Yellow + "NAMESPACE" + "|" + "NAME" + "|" + "REVISION" + "|" + "DESIRED" + "|" + "CURRENT" + "|" + "TRIGGERED BY" + "|" + "Age" + Colors.White}
 							for i := 0; i < len(items); i++ {
-								y := items[i].(map[interface{}]interface{})
-								name := y["metadata"].(map[interface{}]interface{})["name"]
-								nameS := fmt.Sprintf("%v", name)
+								DC := MyDeploymentconfig.Items[i]
+								name := DC.Metadata.Name
 
-								revision := y["status"].(map[interface{}]interface{})["latestVersion"]
-								revisionS := fmt.Sprintf("%v", revision)
+								revision := strconv.Itoa(DC.Status.LatestVersion)
 
-								desired := y["spec"].(map[interface{}]interface{})["replicas"]
-								desiredS := fmt.Sprintf("%v", desired)
+								desired := strconv.Itoa(DC.Spec.Replicas)
 
-								current := y["status"].(map[interface{}]interface{})["availableReplicas"]
-								currentS := fmt.Sprintf("%v", current)
+								current := strconv.Itoa(DC.Status.AvailableReplicas)
 
-								triggers := y["spec"].(map[interface{}]interface{})["triggers"].([]interface{})
+								triggers := DC.Spec.Triggers
 								triggersType := ""
 								for i := 0; i < len(triggers); i++ {
-									if triggers[i].(map[interface{}]interface{})["type"].(string) == "ImageChange" {
-										image := triggers[i].(map[interface{}]interface{})["imageChangeParams"].(map[interface{}]interface{})["from"].(map[interface{}]interface{})["name"]
-										triggersType = triggersType + "image" + "(" + image.(string) + ")"
+									if triggers[i].Type == "ImageChange" {
+										image := triggers[i].ImageChangeParams.From.Name
+										triggersType = triggersType + "image" + "(" + image + ")"
 									} else {
 										triggersType = triggersType + "config"
 									}
@@ -203,7 +202,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 										triggersType = triggersType + ","
 									}
 								}
-								CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+								CreationTime := DC.Metadata.CreationTimestamp
 								CreationTimeS := fmt.Sprintf("%v", CreationTime)
 								t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 								diff := now.Sub(t1).Seconds()
@@ -220,7 +219,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 								} else if hours == "0" {
 									age = minutes + "m" + seconds + "s"
 								}
-								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+revisionS+"|"+desiredS+"|"+currentS+"|"+triggersType+"|"+age+Colors.White)
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+name+"|"+revision+"|"+desired+"|"+current+"|"+triggersType+"|"+age+Colors.White)
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -239,49 +238,41 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			TextViewData = ""
 			// Getting current timestamp
 			now := time.Now().UTC()
-			namespaces, _ := ioutil.ReadDir(MG_Path + "namespaces/")
+			namespaces, _ := ioutil.ReadDir(Namespaces_Path)
 			if len(namespaces) > 0 {
 				Output = []string{Colors.Yellow + "NAMESPACE" + "|" + "NAME" + "|" + "DESIRED" + "|" + "CURRENT" + "|" + "READY" + "|" + "UP-TO-DATE" + "|" + "AVAILABLE" + "|" + "NODE SELECTOR" + "|" + "AGE" + Colors.White}
 				for projectIndex := 0; projectIndex < len(namespaces); projectIndex++ {
-					if _, err := os.Stat(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/apps/daemonsets.yaml"); err == nil {
-						yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/apps/daemonsets.yaml")
-						m := make(map[string]interface{})
-						yaml.Unmarshal(yfile, m)
-						items, _ := m["items"].([]interface{})
+					if _, err := os.Stat(Namespaces_Path + namespaces[projectIndex].Name() + "/apps/daemonsets.yaml"); err == nil {
+						File, _ = ioutil.ReadFile(Namespaces_Path + namespaces[projectIndex].Name() + "/apps/daemonsets.yaml")
+						MyDaemonset := DAEMONSET{}
+						yaml.Unmarshal(File, &MyDaemonset)
+						items := MyDaemonset.Items
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
-								y := items[i].(map[interface{}]interface{})
-								name := y["metadata"].(map[interface{}]interface{})["name"]
-								nameS := fmt.Sprintf("%v", name)
+								Daemonset := MyDaemonset.Items[i]
+								name := Daemonset.Metadata.Name
 
-								desired := y["status"].(map[interface{}]interface{})["desiredNumberScheduled"]
-								desiredS := fmt.Sprintf("%v", desired)
+								desired := strconv.Itoa(Daemonset.Status.DesiredNumberScheduled)
 
-								current := y["status"].(map[interface{}]interface{})["currentNumberScheduled"]
-								currentS := fmt.Sprintf("%v", current)
+								current := strconv.Itoa(Daemonset.Status.CurrentNumberScheduled)
 
-								ready := y["status"].(map[interface{}]interface{})["numberReady"]
-								readyS := fmt.Sprintf("%v", ready)
+								ready := strconv.Itoa(Daemonset.Status.NumberReady)
 
-								uptodate := y["status"].(map[interface{}]interface{})["updatedNumberScheduled"]
-								uptodateS := fmt.Sprintf("%v", uptodate)
+								uptodate := strconv.Itoa(Daemonset.Status.UpdatedNumberScheduled)
 
-								available := y["status"].(map[interface{}]interface{})["numberAvailable"]
-								availableS := fmt.Sprintf("%v", available)
+								available := strconv.Itoa(Daemonset.Status.NumberAvailable)
 
 								// To be enhanced "print key/value only"
-								nodeselector := y["spec"].(map[interface{}]interface{})["template"].(map[interface{}]interface{})["spec"].(map[interface{}]interface{})["nodeSelector"].(map[interface{}]interface{})
-								// nodeselectorS := fmt.Sprintf("%v", nodeselector)
+								nodeselector := Daemonset.Spec.Template.Spec.NodeSelector
 								nodeselectorS := ""
 								count := len(nodeselector)
 								for key, value := range nodeselector {
 									if count > 1 {
 										if fmt.Sprintf("%v", value) != "" {
-											nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key) + ":" + fmt.Sprintf("%v", value) + ", "
+											nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key) + ":" + fmt.Sprintf("%v", value) + ","
 										} else {
-											nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key) + ", "
+											nodeselectorS = nodeselectorS + fmt.Sprintf("%v", key) + ","
 										}
-
 										count--
 									} else {
 										if fmt.Sprintf("%v", value) != "" {
@@ -293,7 +284,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 
 								}
 
-								CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+								CreationTime := Daemonset.Metadata.CreationTimestamp
 								CreationTimeS := fmt.Sprintf("%v", CreationTime)
 								t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 								diff := now.Sub(t1).Seconds()
@@ -311,7 +302,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 									age = minutes + "m" + seconds + "s"
 								}
 
-								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+desiredS+"|"+currentS+"|"+readyS+"|"+uptodateS+"|"+availableS+"|"+nodeselectorS+"|"+age+"|"+Colors.White)
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+name+"|"+desired+"|"+current+"|"+ready+"|"+uptodate+"|"+available+"|"+nodeselectorS+"|"+age+"|"+Colors.White)
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -329,41 +320,27 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			TextViewData = ""
 			// Getting current timestamp
 			now := time.Now().UTC()
-			namespaces, _ := ioutil.ReadDir(MG_Path + "namespaces/")
+			namespaces, _ := ioutil.ReadDir(Namespaces_Path)
 			if len(namespaces) > 0 {
 				Output = []string{Colors.Yellow + "NAMESPACE" + "|" + "NAME" + "|" + "TYPE" + "|" + "CLUSTER-IP" + "|" + "EXTERNAL-IP" + "|" + "PORT(S)" + "|" + "AGE" + Colors.White}
 				for projectIndex := 0; projectIndex < len(namespaces); projectIndex++ {
-					if _, err := os.Stat(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/core/services.yaml"); err == nil {
-						yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/core/services.yaml")
-						m := make(map[interface{}]interface{})
-						yaml.Unmarshal(yfile, m)
-						items, _ := m["items"].([]interface{})
+					if _, err := os.Stat(Namespaces_Path + namespaces[projectIndex].Name() + "/core/services.yaml"); err == nil {
+						File, _ = ioutil.ReadFile(Namespaces_Path + namespaces[projectIndex].Name() + "/core/services.yaml")
+						MyServices := SERVICES{}
+						yaml.Unmarshal(File, &MyServices)
+						items := MyServices.Items
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
-								y := items[i].(map[interface{}]interface{})
-								name := y["metadata"].(map[interface{}]interface{})["name"]
-								nameS := fmt.Sprintf("%v", name)
+								Service := MyServices.Items[i]
+								name := Service.Metadata.Name
 
-								Stype := y["spec"].(map[interface{}]interface{})["type"]
-								StypeS := fmt.Sprintf("%v", Stype)
+								Stype := Service.Spec.Type
 
-								clusterIP := y["spec"].(map[interface{}]interface{})["clusterIP"]
-								clusterIPS := ""
-								if clusterIP == nil {
-									clusterIPS = "None"
-								} else {
-									clusterIPS = fmt.Sprintf("%v", clusterIP)
-								}
+								clusterIP := Service.Spec.ClusterIP
 
-								externalIP := y["spec"].(map[interface{}]interface{})["externalName"]
-								externalIPS := ""
-								if externalIP == nil {
-									externalIPS = "None"
-								} else {
-									externalIPS = fmt.Sprintf("%v", externalIP)
-								}
+								externalIP := "TBA"
 
-								CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+								CreationTime := Service.Metadata.CreationTimestamp
 								CreationTimeS := fmt.Sprintf("%v", CreationTime)
 								t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 								diff := now.Sub(t1).Seconds()
@@ -381,12 +358,12 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 									age = minutes + "m" + seconds + "s"
 								}
 								ports_proto := ""
-								if y["spec"].(map[interface{}]interface{})["ports"] != nil {
-									ports := y["spec"].(map[interface{}]interface{})["ports"].([]interface{})
+								if Service.Spec.Ports != nil {
+									ports := Service.Spec.Ports
 									for i := 0; i < len(ports); i++ {
-										port := ports[i].(map[interface{}]interface{})["port"]
+										port := ports[i].Port
 										portS := fmt.Sprintf("%v", port)
-										proto := ports[i].(map[interface{}]interface{})["protocol"]
+										proto := ports[i].Protocol
 										protoS := fmt.Sprintf("%v", proto)
 										ports_proto = ports_proto + portS + "/" + protoS
 										if i != len(ports)-1 {
@@ -397,7 +374,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 									ports_proto = "None"
 								}
 
-								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+StypeS+"|"+clusterIPS+"|"+externalIPS+"|"+ports_proto+"|"+age+"|"+"\n")
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+name+"|"+Stype+"|"+clusterIP+"|"+externalIP+"|"+ports_proto+"|"+age+"|"+"\n")
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -414,67 +391,19 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			TextView.Clear()
 			TextViewData = ""
 			// Getting current timestamp
-			now := time.Now().UTC()
-			namespaces, _ := ioutil.ReadDir(MG_Path + "namespaces/")
+			namespaces, _ := ioutil.ReadDir(Namespaces_Path)
 			if len(namespaces) > 0 {
 				Output = []string{Colors.Yellow + "NAMESPACE" + "|" + "NAME" + "|" + "HOST/PORT" + "|" + "PATH" + "|" + "SERVICES" + "|" + "PORT" + "|" + "TERMINATION" + "|" + "WILDCARD" + "|" + "AGE" + Colors.White}
 				for projectIndex := 0; projectIndex < len(namespaces); projectIndex++ {
-					if _, err := os.Stat(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/route.openshift.io/routes.yaml"); err == nil {
-						yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/route.openshift.io/routes.yaml")
-						m := make(map[interface{}]interface{})
-						yaml.Unmarshal(yfile, m)
-						items, _ := m["items"].([]interface{})
+					if _, err := os.Stat(Namespaces_Path + namespaces[projectIndex].Name() + "/route.openshift.io/routes.yaml"); err == nil {
+						File, _ = ioutil.ReadFile(Namespaces_Path + namespaces[projectIndex].Name() + "/route.openshift.io/routes.yaml")
+						MyRoutes := ROUTES{}
+						yaml.Unmarshal(File, &MyRoutes)
+						items := MyRoutes.Items
 						if len(items) > 0 {
 							for i := 0; i < len(items); i++ {
-								y := items[i].(map[interface{}]interface{})
-								name := y["metadata"].(map[interface{}]interface{})["name"]
-								nameS := fmt.Sprintf("%v", name)
-
-								host := y["spec"].(map[interface{}]interface{})["host"]
-								hostS := fmt.Sprintf("%v", host)
-
-								services := y["spec"].(map[interface{}]interface{})["to"].(map[interface{}]interface{})["name"]
-								servicesS := fmt.Sprintf("%v", services)
-
-								// port := y["spec"].(map[interface{}]interface{})["port"].(map[interface{}]interface{})["targetPort"]
-								// portS := fmt.Sprintf("%v", port)
-								portS := ""
-								if y["spec"].(map[interface{}]interface{})["port"] != nil {
-									port := y["spec"].(map[interface{}]interface{})["port"].(map[interface{}]interface{})["targetPort"]
-									portS = fmt.Sprintf("%v", port)
-								} else {
-									portS = "nil"
-								}
-
-								insecureEdgeTerminationPolicy := y["spec"].(map[interface{}]interface{})["tls"].(map[interface{}]interface{})["insecureEdgeTerminationPolicy"]
-								termination := y["spec"].(map[interface{}]interface{})["tls"].(map[interface{}]interface{})["termination"]
-								term := ""
-								if termination == nil && insecureEdgeTerminationPolicy == nil {
-									term = "None"
-								} else {
-									term = fmt.Sprintf("%v", termination) + "/" + fmt.Sprintf("%v", insecureEdgeTerminationPolicy)
-								}
-								wildcard := y["spec"].(map[interface{}]interface{})["wildcardPolicy"]
-								wildcardS := fmt.Sprintf("%v", wildcard)
-								CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
-								CreationTimeS := fmt.Sprintf("%v", CreationTime)
-								t1, _ := time.Parse(time.RFC3339, CreationTimeS)
-								diff := now.Sub(t1).Seconds()
-								diffI := int(diff)
-								seconds := strconv.Itoa((diffI % 60))
-								minutes := strconv.Itoa((diffI / 60) % 60)
-								hours := strconv.Itoa((diffI / 360) % 24)
-								days := strconv.Itoa((diffI / 86400))
-								age := ""
-								if days != "0" {
-									age = days + "d" + hours + "h"
-								} else if days == "0" && hours != "" {
-									age = hours + "h" + minutes + "m"
-								} else if hours == "0" {
-									age = minutes + "m" + seconds + "s"
-								}
-
-								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+nameS+"|"+hostS+"|"+""+"|"+servicesS+"|"+portS+"|"+term+"|"+wildcardS+"|"+age+"|"+"\n")
+								name, host, services, port, term, wildcard, age := GetRouteDetails(items[i])
+								Output = append(Output, Colors.White+namespaces[projectIndex].Name()+"|"+name+"|"+host+"|"+"TBA"+"|"+services+"|"+port+"|"+term+"|"+wildcard+"|"+age+"|"+"\n")
 							}
 							FormatedOutput := columnize.SimpleFormat(Output)
 							TextView.SetText(FormatedOutput)
@@ -1221,75 +1150,30 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 				TextViewData = FormatedOutput
 			}
 		} else if List3Item == "Routes" {
-			// Get projects routes "if exists"
-			// Table of Projects/Routes
 			// Cleaning TextView and TextViewData
 			TextView.Clear()
 			TextViewData = ""
-			// Getting current timestamp
-			now := time.Now().UTC()
 			Output = []string{Colors.Yellow + "NAME" + "|" + "HOST/PORT" + "|" + "PATH" + "|" + "SERVICES" + "|" + "PORT" + "|" + "TERMINATION" + "|" + "WILDCARD" + "|" + "AGE" + Colors.White}
-			yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/route.openshift.io/routes.yaml")
-			m := make(map[interface{}]interface{})
-			yaml.Unmarshal(yfile, m)
-			items, _ := m["items"].([]interface{})
+			File, _ = ioutil.ReadFile(Namespaces_Path + List2Item + "/route.openshift.io/routes.yaml")
+			MyRoutes := ROUTES{}
+			yaml.Unmarshal(File, &MyRoutes)
+			items := MyRoutes.Items
 			if len(items) > 0 {
 				List4.SetTitle("Routes")
 				for i := 0; i < len(items); i++ {
-					y := items[i].(map[interface{}]interface{})
-					name := y["metadata"].(map[interface{}]interface{})["name"]
-					nameS := fmt.Sprintf("%v", name)
-					List4.AddItem(nameS, "", 0, nil)
+					name, host, services, port, term, wildcard, age := GetRouteDetails(items[i])
 
-					host := y["spec"].(map[interface{}]interface{})["host"]
-					hostS := fmt.Sprintf("%v", host)
-
-					services := y["spec"].(map[interface{}]interface{})["to"].(map[interface{}]interface{})["name"]
-					servicesS := fmt.Sprintf("%v", services)
-
-					portS := ""
-					if y["spec"].(map[interface{}]interface{})["port"] != nil {
-						port := y["spec"].(map[interface{}]interface{})["port"].(map[interface{}]interface{})["targetPort"]
-						portS = fmt.Sprintf("%v", port)
-					} else {
-						portS = "nil"
-					}
-
-					insecureEdgeTerminationPolicy := y["spec"].(map[interface{}]interface{})["tls"].(map[interface{}]interface{})["insecureEdgeTerminationPolicy"]
-					termination := y["spec"].(map[interface{}]interface{})["tls"].(map[interface{}]interface{})["termination"]
-					term := ""
-					if termination == nil && insecureEdgeTerminationPolicy == nil {
-						term = "None"
-					} else {
-						term = fmt.Sprintf("%v", termination) + "/" + fmt.Sprintf("%v", insecureEdgeTerminationPolicy)
-					}
-					wildcard := y["spec"].(map[interface{}]interface{})["wildcardPolicy"]
-					wildcardS := fmt.Sprintf("%v", wildcard)
-					CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
-					CreationTimeS := fmt.Sprintf("%v", CreationTime)
-					t1, _ := time.Parse(time.RFC3339, CreationTimeS)
-					diff := now.Sub(t1).Seconds()
-					diffI := int(diff)
-					seconds := strconv.Itoa((diffI % 60))
-					minutes := strconv.Itoa((diffI / 60) % 60)
-					hours := strconv.Itoa((diffI / 360) % 24)
-					days := strconv.Itoa((diffI / 86400))
-					age := ""
-					if days != "0" {
-						age = days + "d" + hours + "h"
-					} else if days == "0" && hours != "" {
-						age = hours + "h" + minutes + "m"
-					} else if hours == "0" {
-						age = minutes + "m" + seconds + "s"
-					}
-
-					Output = append(Output, Colors.White+nameS+"|"+hostS+"|"+""+"|"+servicesS+"|"+portS+"|"+term+"|"+wildcardS+"|"+age+"|"+Colors.White)
+					Output = append(Output, Colors.White+name+"|"+host+"|"+"TBA"+"|"+services+"|"+port+"|"+term+"|"+wildcard+"|"+age+"|"+Colors.White)
 				}
 				FormatedOutput := columnize.SimpleFormat(Output)
 				TextView.SetText(FormatedOutput)
 				TextView.ScrollToBeginning()
 				TextViewData = FormatedOutput
 
+			} else {
+				TextView.SetText("No Available Data")
+				TextView.ScrollToBeginning()
+				TextViewData = FormatedOutput
 			}
 		} else if List3Item == "Image Stream" {
 			// Get projects IS "if exists"
@@ -1624,16 +1508,45 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			TextViewData = FormatedOutput
 		}
 	} else if List1Item == "Nodes" && List3Item == "Summary" {
-		GetNodesInfo(List2Item, "Summary")
+		// Cleaning TextView and TextViewData
+		TextView.Clear()
+		TextViewData = ""
+		File, _ = ioutil.ReadFile(Nodes_Path + List2Item + ".yaml")
+		Output = []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "STATUS" + Colors.Yellow + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSION" + Colors.White}
+		MyNode := NODE{}
+		yaml.Unmarshal(File, &MyNode)
+		name, status, roles, age, version, _, _, _, _, _, _ := GetNodeDetails(MyNode)
+		Output = append(Output, Colors.White+name+"|"+status+"|"+roles+"|"+age+"|"+version+Colors.White)
+		FormatedOutput := columnize.SimpleFormat(Output)
+		TextView.SetText(FormatedOutput)
+		TextView.ScrollToBeginning()
+		TextViewData = FormatedOutput
 	} else if List1Item == "Nodes" && List3Item == "Details" {
-		GetNodesInfo(List2Item, "Details")
+		// Cleaning TextView and TextViewData
+		TextView.Clear()
+		TextViewData = ""
+		File, _ = ioutil.ReadFile(Nodes_Path + List2Item + ".yaml")
+		Output = []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "STATUS" + Colors.Yellow + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSION" + "|" + "INTERNAL-IP" + "|" + "EXTERNAL-IP" + "|" + "OS-IMAGE" + "|" + "KERNEL-VERSION" + "|" + "CONTAINER-RUNTIME" + Colors.White + "\n"}
+		MyNode := NODE{}
+		yaml.Unmarshal(File, &MyNode)
+		name, status, roles, age, version, internalIP, externalIP, osImage, kernelVersion, contRuntime, _ := GetNodeDetails(MyNode)
+		Output = append(Output, Colors.White+name+"|"+status+"|"+roles+"|"+age+"|"+version+"|"+internalIP+"|"+externalIP+"|"+osImage+"|"+kernelVersion+"|"+contRuntime+Colors.White)
+		FormatedOutput := columnize.SimpleFormat(Output)
+		TextView.SetText(FormatedOutput)
+		TextView.ScrollToBeginning()
+		TextViewData = FormatedOutput
 	} else if List1Item == "Nodes" && List3Item == "YAML" {
 		// Get node's YAML
 		File, _ = os.ReadFile(MG_Path + "cluster-scoped-resources/core/nodes/" + List2Item + ".yaml")
 		TextView.SetText(string(File))
 		TextViewData = TextView.GetText(false)
 		TextView.ScrollToBeginning()
-		List6.AddItem("Metadata", "", 0, nil).AddItem("Spec", "", 0, nil).AddItem("Status", "", 0, nil).AddItem("HW Spec", "", 0, nil).AddItem("Images", "", 0, nil)
+		List6.AddItem("Metadata", "", 0, nil).
+			AddItem("Spec", "", 0, nil).
+			AddItem("Status", "", 0, nil).
+			AddItem("HW Specs", "", 0, nil).
+			AddItem("Images", "", 0, nil).
+			AddItem("nodeInfo", "", 0, nil)
 	} else if List1Item == "Operators" && List3Item == "YAML" {
 		// Cleaning TextView and TextViewData
 		TextView.Clear()
@@ -1756,23 +1669,20 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = ""
 		now := time.Now().UTC()
 		Output := []string{Colors.Yellow + "NAME" + "|" + "GENERATEDBYCONTROLLER" + "|" + "IGNITIONVERSION" + "|" + "AGE" + Colors.White}
-		yfile, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + List2Item + ".yaml")
+		File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + List2Item + ".yaml")
 
-		m := make(map[string]interface{})
-		yaml.Unmarshal(yfile, m)
+		MyMC := MC{}
+		yaml.Unmarshal(File, &MyMC)
 
-		name := m["metadata"].(map[interface{}]interface{})["name"]
-		nameS := fmt.Sprintf("%v", name)
+		name := MyMC.Metadata.Name
+		List2.AddItem(name, "", 0, nil)
 
-		// TBA
-		// ganaratedBy := m["metadata"].(map[interface{}]interface{})["annotations"]
-		// generatedByS := fmt.Sprintf("%v", ganaratedBy)
-		generatedByS := "TBA"
+		generatedByMap := MyMC.Metadata.Annotations
+		generatedBy := generatedByMap["machineconfiguration.openshift.io/generated-by-controller-version"]
 
-		ignitionVersion := m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["ignition"].(map[interface{}]interface{})["version"]
-		ignitionVersionS := fmt.Sprintf("%v", ignitionVersion)
+		ignitionVersion := MyMC.Spec.Config.Ignition.Version
 
-		CreationTime := m["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+		CreationTime := MyMC.Metadata.CreationTimestamp
 		CreationTimeS := fmt.Sprintf("%v", CreationTime)
 		t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 		diff := now.Sub(t1).Seconds()
@@ -1789,7 +1699,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		} else if hours == "0" {
 			age = minutes + "m" + seconds + "s"
 		}
-		Output = append(Output, Colors.White+nameS+"|"+generatedByS+"|"+ignitionVersionS+"|"+age+Colors.White)
+		Output = append(Output, Colors.White+name+"|"+generatedBy+"|"+ignitionVersion+"|"+age+Colors.White)
 
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)
@@ -1807,19 +1717,17 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 
 		List4.SetTitle("Files")
 
-		yfile, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + List2Item + ".yaml")
+		File, _ = ioutil.ReadFile(MC_Path + List2Item + ".yaml")
 
-		m := make(map[string]interface{})
-		yaml.Unmarshal(yfile, m)
+		MyMC := MC{}
+		yaml.Unmarshal(File, &MyMC)
 
-		if m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["storage"] != nil {
-			paths := m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["storage"].(map[interface{}]interface{})["files"].([]interface{})
-
-			for i := range paths {
-				path := fmt.Sprintf("%v", paths[i].(map[interface{}]interface{})["path"])
-				List4.AddItem(path, "", 0, nil)
-			}
+		paths := MyMC.Spec.Config.Storage.Files
+		for i := range paths {
+			path := fmt.Sprintf("%v", paths[i].Path)
+			List4.AddItem(path, "", 0, nil)
 		}
+
 	} else if List1Item == "PV" && List3Item == "Info" {
 
 		// Cleaning TextView and TextViewData
@@ -1827,35 +1735,29 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = ""
 		now := time.Now().UTC()
 		Output := []string{Colors.Yellow + "NAME" + "|" + "CAPACITY" + "|" + "ACCESS MODE" + "|" + "RECLAIM POLICY" + "|" + "STATUS" + "|" + "CLAIM" + "|" + "STORAGECLASS" + "|" + "AGE" + Colors.White}
-		yfile, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/core/persistentvolumes/" + List2Item + ".yaml")
+		File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/core/persistentvolumes/" + List2Item + ".yaml")
+		MyPV := PV{}
+		yaml.Unmarshal(File, &MyPV)
 
-		m := make(map[string]interface{})
-		yaml.Unmarshal(yfile, m)
+		name := MyPV.Metadata.Name
+		List2.AddItem(name, "", 0, nil)
 
-		name := m["metadata"].(map[interface{}]interface{})["name"]
-		nameS := fmt.Sprintf("%v", name)
+		capacity := MyPV.Spec.Capacity.Storage
 
-		capacity := m["spec"].(map[interface{}]interface{})["capacity"].(map[interface{}]interface{})["storage"]
-		capacityS := fmt.Sprintf("%v", capacity)
+		accessArray := MyPV.Spec.AccessModes
+		access := fmt.Sprintf("%v", accessArray)
+		access = strings.Replace(access, "[", "", -1)
+		access = strings.Replace(access, "]", "", -1)
 
-		access := m["spec"].(map[interface{}]interface{})["accessModes"]
-		accessS := fmt.Sprintf("%v", access)
-		accessS = strings.Replace(accessS, "[", "", -1)
-		accessS = strings.Replace(accessS, "]", "", -1)
+		reclaim := MyPV.Spec.PersistentVolumeReclaimPolicy
 
-		reclaim := m["spec"].(map[interface{}]interface{})["claimRef"].(map[interface{}]interface{})["name"]
-		reclaimS := fmt.Sprintf("%v", reclaim)
+		status := MyPV.Status.Phase
 
-		status := m["status"].(map[interface{}]interface{})["phase"]
-		statusS := fmt.Sprintf("%v", status)
+		claim := MyPV.Spec.ClaimRef.Name
 
-		claim := m["metadata"].(map[interface{}]interface{})["name"]
-		claimS := fmt.Sprintf("%v", claim)
+		storageclass := MyPV.Spec.StorageClassName
 
-		storageclass := m["spec"].(map[interface{}]interface{})["storageClassName"]
-		storageclassS := fmt.Sprintf("%v", storageclass)
-
-		CreationTime := m["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+		CreationTime := MyPV.Metadata.CreationTimestamp
 		CreationTimeS := fmt.Sprintf("%v", CreationTime)
 		t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 		diff := now.Sub(t1).Seconds()
@@ -1873,7 +1775,7 @@ func ThirdListOnSelect(index int, list_item_name string, second string, run rune
 			age = minutes + "m" + seconds + "s"
 		}
 
-		Output = append(Output, Colors.White+nameS+"|"+capacityS+"|"+accessS+"|"+reclaimS+"|"+statusS+"|"+claimS+"|"+storageclassS+"|"+age+Colors.White)
+		Output = append(Output, Colors.White+name+"|"+capacity+"|"+access+"|"+reclaim+"|"+status+"|"+claim+"|"+storageclass+"|"+age+Colors.White)
 
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)

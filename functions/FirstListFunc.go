@@ -32,7 +32,16 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 
 	// Adding selection path to the ActivePathBox
 	ActivePathBox.SetText(List1Item + " -> ")
-	if list_item_name == "Summary" {
+	if list_item_name == "Navigate" {
+		// App.SetInputCapture(KeyboardKeys).
+		// 	SetRoot(TableGrid, true).
+		// 	EnableMouse(true)
+
+		// App.SetInputCapture(KeyboardKeys).
+		// SetRoot(MainGrid, true).
+		// EnableMouse(true)
+	} else if list_item_name == "Summary" {
+
 		Output = []string{}
 		//////////////////////
 		// Get cluster version
@@ -201,15 +210,6 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.ScrollToBeginning()
 		TextViewData = FormatedOutput
 
-	} else if list_item_name == "Configurations" {
-		List2.SetTitle("Cluster Configurations")
-		files, _ := ioutil.ReadDir(MG_Path + "cluster-scoped-resources/config.openshift.io/")
-		for i := range files {
-			if !files[i].IsDir() {
-				List2.AddItem(strings.Split(files[i].Name(), ".yaml")[0], "", 0, nil)
-			}
-		}
-
 	} else if list_item_name == "OCP Version" {
 		List2.SetTitle("Cluster Version Detail")
 		List2.
@@ -219,6 +219,15 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.SetText(string(File))
 		TextView.ScrollToBeginning()
 		TextViewData = FormatedOutput
+
+	} else if list_item_name == "Configurations" {
+		List2.SetTitle("Cluster Configurations")
+		files, _ := ioutil.ReadDir(MG_Path + "cluster-scoped-resources/config.openshift.io/")
+		for i := range files {
+			if !files[i].IsDir() {
+				List2.AddItem(strings.Split(files[i].Name(), ".yaml")[0], "", 0, nil)
+			}
+		}
 
 	} else if list_item_name == "Projects" {
 		List2.SetTitle("Projects")
@@ -246,7 +255,6 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 			nodeName := strings.Split(node.Name(), ".yaml")
 			List2.AddItem(nodeName[0], "", 0, nil)
 		}
-
 	} else if list_item_name == "Operators" {
 		List2.SetTitle("Operators")
 		// Get cluster version
@@ -258,7 +266,6 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/config.openshift.io/clusteroperators.yaml")
 		Output := []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "VERSION" + Colors.Yellow + "|" + Colors.Yellow + "AVAILABLE" + Colors.Yellow + "|" + Colors.Yellow + "PROGRESSING" + Colors.Yellow + "|" + Colors.Yellow + "DEGRADED" + Colors.Yellow + "|" + "SINCE" + Colors.White}
 		MyOperators := OPERATORS{}
-		// m := make(map[interface{}]interface{})
 		yaml.Unmarshal(File, &MyOperators)
 		items := MyOperators.Items
 		for i := range items {
@@ -365,26 +372,22 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = ""
 		now := time.Now().UTC()
 		Output := []string{Colors.Yellow + "NAME" + "|" + "GENERATEDBYCONTROLLER" + "|" + "IGNITIONVERSION" + "|" + "AGE" + Colors.White + "\n"}
-		files, _ := ioutil.ReadDir(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/")
-		for _, file := range files {
-			yfile, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + file.Name())
+		Files, _ = ioutil.ReadDir(MC_Path)
+		for _, file := range Files {
+			File, _ = ioutil.ReadFile(MC_Path + file.Name())
 
-			m := make(map[string]interface{})
-			yaml.Unmarshal(yfile, m)
+			MyMC := MC{}
+			yaml.Unmarshal(File, &MyMC)
 
-			name := m["metadata"].(map[interface{}]interface{})["name"]
-			nameS := fmt.Sprintf("%v", name)
-			List2.AddItem(nameS, "", 0, nil)
+			name := MyMC.Metadata.Name
+			List2.AddItem(name, "", 0, nil)
 
-			// TBA
-			// ganaratedBy := m["metadata"].(map[interface{}]interface{})["annotations"].(map[interface{}]interface{})["machineconfiguration.openshift.io/generated-by-controller-version"]
-			// generatedByS := fmt.Sprintf("%v", ganaratedBy)
-			generatedByS := "TBA"
+			generatedByMap := MyMC.Metadata.Annotations
+			generatedBy := generatedByMap["machineconfiguration.openshift.io/generated-by-controller-version"]
 
-			ignitionVersion := m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["ignition"].(map[interface{}]interface{})["version"]
-			ignitionVersionS := fmt.Sprintf("%v", ignitionVersion)
+			ignitionVersion := MyMC.Spec.Config.Ignition.Version
 
-			CreationTime := m["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+			CreationTime := MyMC.Metadata.CreationTimestamp
 			CreationTimeS := fmt.Sprintf("%v", CreationTime)
 			t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 			diff := now.Sub(t1).Seconds()
@@ -401,7 +404,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 			} else if hours == "0" {
 				age = minutes + "m" + seconds + "s"
 			}
-			Output = append(Output, Colors.White+nameS+"|"+generatedByS+"|"+ignitionVersionS+"|"+age+Colors.White+"\n")
+			Output = append(Output, Colors.White+name+"|"+generatedBy+"|"+ignitionVersion+"|"+age+Colors.White+"\n")
 		}
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)
@@ -414,37 +417,31 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = ""
 		now := time.Now().UTC()
 		Output := []string{Colors.Yellow + "NAME" + "|" + "CAPACITY" + "|" + "ACCESS MODE" + "|" + "RECLAIM POLICY" + "|" + "STATUS" + "|" + "CLAIM" + "|" + "STORAGECLASS" + "|" + "AGE" + Colors.White}
-		files, _ := ioutil.ReadDir(MG_Path + "cluster-scoped-resources/core/persistentvolumes/")
-		for _, file := range files {
-			yfile, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/core/persistentvolumes/" + file.Name())
+		Files, _ = ioutil.ReadDir(MG_Path + "cluster-scoped-resources/core/persistentvolumes/")
+		for _, f := range Files {
+			File, _ = ioutil.ReadFile(MG_Path + "cluster-scoped-resources/core/persistentvolumes/" + f.Name())
+			MyPV := PV{}
+			yaml.Unmarshal(File, &MyPV)
 
-			m := make(map[string]interface{})
-			yaml.Unmarshal(yfile, m)
+			name := MyPV.Metadata.Name
+			List2.AddItem(name, "", 0, nil)
 
-			name := m["metadata"].(map[interface{}]interface{})["name"]
-			nameS := fmt.Sprintf("%v", name)
-			List2.AddItem(nameS, "", 0, nil)
-			capacity := m["spec"].(map[interface{}]interface{})["capacity"].(map[interface{}]interface{})["storage"]
-			capacityS := fmt.Sprintf("%v", capacity)
+			capacity := MyPV.Spec.Capacity.Storage
 
-			access := m["spec"].(map[interface{}]interface{})["accessModes"]
-			accessS := fmt.Sprintf("%v", access)
-			accessS = strings.Replace(accessS, "[", "", -1)
-			accessS = strings.Replace(accessS, "]", "", -1)
+			accessArray := MyPV.Spec.AccessModes
+			access := fmt.Sprintf("%v", accessArray)
+			access = strings.Replace(access, "[", "", -1)
+			access = strings.Replace(access, "]", "", -1)
 
-			reclaim := m["spec"].(map[interface{}]interface{})["claimRef"].(map[interface{}]interface{})["name"]
-			reclaimS := fmt.Sprintf("%v", reclaim)
+			reclaim := MyPV.Spec.PersistentVolumeReclaimPolicy
 
-			status := m["status"].(map[interface{}]interface{})["phase"]
-			statusS := fmt.Sprintf("%v", status)
+			status := MyPV.Status.Phase
 
-			claim := m["metadata"].(map[interface{}]interface{})["name"]
-			claimS := fmt.Sprintf("%v", claim)
+			claim := MyPV.Spec.ClaimRef.Name
 
-			storageclass := m["spec"].(map[interface{}]interface{})["storageClassName"]
-			storageclassS := fmt.Sprintf("%v", storageclass)
+			storageclass := MyPV.Spec.StorageClassName
 
-			CreationTime := m["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+			CreationTime := MyPV.Metadata.CreationTimestamp
 			CreationTimeS := fmt.Sprintf("%v", CreationTime)
 			t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 			diff := now.Sub(t1).Seconds()
@@ -462,7 +459,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 				age = minutes + "m" + seconds + "s"
 			}
 
-			Output = append(Output, Colors.White+nameS+"|"+capacityS+"|"+accessS+"|"+reclaimS+"|"+statusS+"|"+claimS+"|"+storageclassS+"|"+age+Colors.White)
+			Output = append(Output, Colors.White+name+"|"+capacity+"|"+access+"|"+reclaim+"|"+status+"|"+claim+"|"+storageclass+"|"+age+Colors.White)
 		}
 		FormatedOutput := columnize.SimpleFormat(Output)
 		TextView.SetText(FormatedOutput)

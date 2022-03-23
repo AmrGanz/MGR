@@ -53,6 +53,7 @@ func MGDropDownOnSelect() {
 			} else {
 				List1.
 					ShowSecondaryText(false).
+					// AddItem("Navigate", "", 0, nil).
 					AddItem("Summary", "", 0, nil).
 					AddItem("OCP Version", "", 0, nil).
 					AddItem("Configurations", "", 0, nil).
@@ -168,7 +169,7 @@ func SetPath() {
 
 func CreateUI() {
 	// Modifying MGDropDown's attributes
-	MGDropDown.SetLabel("Select a must-gather type:  ")
+	MGDropDown.SetLabel("Select MG type:  ")
 
 	// Modifying buttons' attributes
 	ClusterInfoButton.SetBorder(false).SetBackgroundColor(tcell.ColorBlue)
@@ -193,6 +194,7 @@ func CreateUI() {
 	TextView.
 		SetDynamicColors(true).
 		// SetWordWrap(true).
+		SetWrap(false).
 		SetChangedFunc(func() {
 			App.Draw()
 		})
@@ -284,6 +286,25 @@ func CreateUI() {
 		AddItem(SearchBox, 4, 4, 1, 3, 0, 0, false).
 		AddItem(SearchButton, 4, 7, 1, 1, 0, 0, false).
 		AddItem(TextView, 1, 4, 3, 4, 0, 0, false)
+
+	TableGrid.
+		SetRows(rows...).
+		SetColumns(columns...).
+		SetBorders(true).
+		AddItem(MGDropDown, 0, 0, 1, 4, 0, 0, false).
+		AddItem(ActivePathBox, 0, 4, 1, 1, 0, 0, false).
+		AddItem(HelpButton, 0, 5, 1, 1, 0, 0, false).
+		AddItem(CopyModeButton, 0, 6, 1, 1, 0, 0, false).
+		AddItem(ExitButton, 0, 7, 1, 1, 0, 0, false).
+		AddItem(List1, 1, 0, 1, 1, 0, 0, false).
+		AddItem(List2, 1, 1, 1, 3, 0, 0, false).
+		AddItem(List3, 2, 0, 3, 1, 0, 0, false).
+		AddItem(List4, 2, 1, 1, 2, 0, 0, false).
+		AddItem(List5, 3, 1, 2, 2, 0, 0, false).
+		AddItem(List6, 2, 3, 3, 1, 0, 0, false).
+		AddItem(SearchBox, 4, 4, 1, 3, 0, 0, false).
+		AddItem(SearchButton, 4, 7, 1, 1, 0, 0, false).
+		AddItem(Table, 1, 4, 3, 4, 0, 0, false)
 
 	CopyModeGrid.
 		SetRows(rows...).

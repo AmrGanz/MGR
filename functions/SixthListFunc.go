@@ -15,12 +15,16 @@ import (
 func SixthListOnSelect(index int, list_item_name string, second string, run rune) {
 	List6Item = list_item_name
 	TextView.Clear()
+
 	ActivePathBox.SetText(List1Item + " -> " + List2Item + " -> " + List3Item + " -> " + List4Item + " -> " + List5Item + " -> " + List6Item)
 	if List1Item == "Projects" && List3Item == "Pods" {
 		// Print Container's logs
-		File, _ := ioutil.ReadFile(Namespaces_Path + List2Item + "/pods/" + List4Item + "/" + List5Item + "/" + List5Item + "/logs/" + List6Item + ".log")
+		TextView.Clear()
+		File, _ = ioutil.ReadFile(Namespaces_Path + List2Item + "/pods/" + List4Item + "/" + List5Item + "/" + List5Item + "/logs/" + List6Item + ".log")
+		// [reminder] Word Wrapping is disabled in "Grids.go" for a better performance
 		TextView.SetText(string(File))
 		TextViewData = string(File)
+
 	} else if List1Item == "Projects" && List3Item == "Deployment" && List6Item == "Info" {
 		// Get projects deployments "if exists"
 		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/deployments.yaml")
@@ -716,38 +720,48 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		TextView.SetText("TBA")
 		TextView.ScrollToBeginning()
 	} else if List1Item == "Nodes" && List3Item == "YAML" {
+		File, _ = ioutil.ReadFile(Nodes_Path + List2Item + ".yaml")
+		MyNode := NODE{}
+		yaml.Unmarshal(File, &MyNode)
 		if List6Item == "Metadata" {
-			Metadta, _ := yaml.Marshal(MyNode_Public.Metadata)
+			Metadta, _ := yaml.Marshal(MyNode.Metadata)
 			MetadtaS := Colors.Orange + "Metadta:\n" + Colors.White + string(Metadta)
 			TextView.Clear()
+			TextView.SetWrap(true)
 			TextView.SetText(MetadtaS)
 			TextView.ScrollToBeginning()
 		} else if List6Item == "Spec" {
-			Spec, _ := yaml.Marshal(MyNode_Public.Spec)
+			Spec, _ := yaml.Marshal(MyNode.Spec)
 			SpecS := Colors.Orange + "Spec:\n" + Colors.White + string(Spec)
 			TextView.Clear()
 			TextView.SetText(SpecS)
 			TextView.ScrollToBeginning()
 		} else if List6Item == "Status" {
-			Status, _ := yaml.Marshal(MyNode_Public.Status)
+			Status, _ := yaml.Marshal(MyNode.Status)
 			StatusS := Colors.Orange + "Status:\n" + Colors.White + string(Status)
 			TextView.Clear()
 			TextView.SetText(StatusS)
 			TextView.ScrollToBeginning()
-		} else if List6Item == "HW Spec" {
+		} else if List6Item == "HW Specs" {
 			HWSpec := ""
-			Addresses, _ := yaml.Marshal(MyNode_Public.Status.Addresses)
-			Allocatable, _ := yaml.Marshal(MyNode_Public.Status.Allocatable)
-			Capacity, _ := yaml.Marshal(MyNode_Public.Status.Capacity)
+			Addresses, _ := yaml.Marshal(MyNode.Status.Addresses)
+			Allocatable, _ := yaml.Marshal(MyNode.Status.Allocatable)
+			Capacity, _ := yaml.Marshal(MyNode.Status.Capacity)
 			HWSpec += Colors.Orange + "Addresses:\n" + Colors.White + string(Addresses) + Colors.Orange + "Allocatable:\n" + Colors.White + string(Allocatable) + Colors.Orange + "Capacity:\n" + Colors.White + string(Capacity)
 			TextView.Clear()
 			TextView.SetText(HWSpec)
 			TextView.ScrollToBeginning()
 		} else if List6Item == "Images" {
-			Images, _ := yaml.Marshal(MyNode_Public.Status.Images)
+			Images, _ := yaml.Marshal(MyNode.Status.Images)
 			ImagesS := Colors.Orange + "Images:\n" + Colors.White + string(Images)
 			TextView.Clear()
 			TextView.SetText(ImagesS)
+			TextView.ScrollToBeginning()
+		} else if List6Item == "nodeInfo" {
+			NodeInfo, _ := yaml.Marshal(MyNode.Status.NodeInfo)
+			NodeInfoS := Colors.Orange + "NodeInfo:\n" + Colors.White + string(NodeInfo)
+			TextView.Clear()
+			TextView.SetText(NodeInfoS)
 			TextView.ScrollToBeginning()
 		}
 	}

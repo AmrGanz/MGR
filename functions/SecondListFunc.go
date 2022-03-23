@@ -119,13 +119,82 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 		}
 	} else if List1Item == "Nodes" {
 		if List2Item == "Nodes Summary" {
-			GetNodesInfo("All Nodes", "Summary")
+			// Cleaning TextView and TextViewData
+			TextView.Clear()
+			TextViewData = ""
+			Files, Err = ioutil.ReadDir(Nodes_Path)
+			if Err != nil {
+				TextView.SetText(Err.Error())
+			} else {
+				Output = []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "STATUS" + Colors.Yellow + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSION" + Colors.White}
+				for i := range Files {
+					MyNode := NODE{}
+					File, _ = ioutil.ReadFile(Nodes_Path + Files[i].Name())
+					yaml.Unmarshal(File, &MyNode)
+					name, status, roles, age, version, _, _, _, _, _, _ := GetNodeDetails(MyNode)
+					Output = append(Output, Colors.White+name+"|"+status+"|"+roles+"|"+age+"|"+version+Colors.White)
+				}
+				FormatedOutput := columnize.SimpleFormat(Output)
+				TextView.SetText(FormatedOutput)
+				TextView.ScrollToBeginning()
+				TextViewData = FormatedOutput
+			}
 		} else if List2Item == "Nodes Details" {
-			GetNodesInfo("All Nodes", "Details")
+			// Cleaning TextView and TextViewData
+			TextView.Clear()
+			TextViewData = ""
+			Files, Err = ioutil.ReadDir(Nodes_Path)
+			if Err != nil {
+				TextView.SetText("Couldn't read Nodes directory's contents")
+			} else {
+				Output = []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "STATUS" + Colors.Yellow + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSION" + "|" + "INTERNAL-IP" + "|" + "EXTERNAL-IP" + "|" + "OS-IMAGE" + "|" + "KERNEL-VERSION" + "|" + "CONTAINER-RUNTIME" + Colors.White + "\n"}
+				for i := range Files {
+					MyNode := NODE{}
+					File, _ = ioutil.ReadFile(Nodes_Path + Files[i].Name())
+					yaml.Unmarshal(File, &MyNode)
+					name, status, roles, age, version, internalIP, externalIP, osImage, kernelVersion, contRuntime, _ := GetNodeDetails(MyNode)
+					Output = append(Output, Colors.White+name+"|"+status+"|"+roles+"|"+age+"|"+version+"|"+internalIP+"|"+externalIP+"|"+osImage+"|"+kernelVersion+"|"+contRuntime+Colors.White)
+				}
+				FormatedOutput := columnize.SimpleFormat(Output)
+				TextView.SetText(FormatedOutput)
+				TextView.ScrollToBeginning()
+				TextViewData = FormatedOutput
+			}
 		} else if List2Item == "Nodes Labels" {
-			GetNodesInfo("All Nodes", "Labels")
+			// Cleaning TextView and TextViewData
+			TextView.Clear()
+			TextViewData = ""
+			Files, Err = ioutil.ReadDir(Nodes_Path)
+			if Err != nil {
+				TextView.SetText("Couldn't read Nodes directory's contents")
+			} else {
+				Output = []string{Colors.Yellow + "NAME" + "|" + "LABELS" + Colors.White}
+				for i := range Files {
+					MyNode := NODE{}
+					File, _ = ioutil.ReadFile(Nodes_Path + Files[i].Name())
+					yaml.Unmarshal(File, &MyNode)
+					name, _, _, _, _, _, _, _, _, _, AllLabels := GetNodeDetails(MyNode)
+					Output = append(Output, Colors.White+name+"|"+AllLabels+Colors.White)
+				}
+				FormatedOutput := columnize.SimpleFormat(Output)
+				TextView.SetText(FormatedOutput)
+				TextView.ScrollToBeginning()
+				TextViewData = FormatedOutput
+			}
 		} else {
-			GetNodesInfo(List2Item, "Summary")
+			// Cleaning TextView and TextViewData
+			TextView.Clear()
+			TextViewData = ""
+			File, _ = ioutil.ReadFile(Nodes_Path + List2Item + ".yaml")
+			Output = []string{Colors.Yellow + "NAME" + "|" + Colors.Yellow + "STATUS" + Colors.Yellow + "|" + "ROLES" + "|" + "AGE" + "|" + "VERSION" + Colors.White}
+			MyNode := NODE{}
+			yaml.Unmarshal(File, &MyNode)
+			name, status, roles, age, version, _, _, _, _, _, _ := GetNodeDetails(MyNode)
+			Output = append(Output, Colors.White+name+"|"+status+"|"+roles+"|"+age+"|"+version+Colors.White)
+			FormatedOutput := columnize.SimpleFormat(Output)
+			TextView.SetText(FormatedOutput)
+			TextView.ScrollToBeginning()
+			TextViewData = FormatedOutput
 			List3.
 				AddItem("Summary", "", 0, nil).
 				AddItem("Details", "", 0, nil).

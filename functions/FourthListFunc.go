@@ -105,7 +105,7 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 			// Cleaning TextView and TextViewData
 			TextView.Clear()
 			TextViewData = ""
-			File, _ := ioutil.ReadFile(Namespaces_Path + List2Item + InstallPlans + List4Item + ".yaml")
+			File, _ = ioutil.ReadFile(Namespaces_Path + List2Item + InstallPlans_Path + List4Item + ".yaml")
 			TextView.SetText(string(File))
 			TextView.ScrollToBeginning()
 			TextViewData = FormatedOutput
@@ -114,17 +114,16 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 		TextView.Clear()
 		TextViewData = ""
 
-		yfile, _ := ioutil.ReadFile(MG_Path + "cluster-scoped-resources/machineconfiguration.openshift.io/machineconfigs/" + List2Item + ".yaml")
-
-		m := make(map[string]interface{})
-		yaml.Unmarshal(yfile, m)
+		File, _ = ioutil.ReadFile(MC_Path + List2Item + ".yaml")
+		MyMC := MC{}
+		yaml.Unmarshal(File, &MyMC)
 
 		// files is mc.spec.config.storage.files
-		files := m["spec"].(map[interface{}]interface{})["config"].(map[interface{}]interface{})["storage"].(map[interface{}]interface{})["files"].([]interface{})
+		files := MyMC.Spec.Config.Storage.Files
 		for i := range files {
-			MCfilePath := fmt.Sprintf("%v", files[i].(map[interface{}]interface{})["path"])
+			MCfilePath := fmt.Sprintf("%v", files[i].Path)
 			if MCfilePath == List4Item {
-				contents := fmt.Sprintf("%v", files[i].(map[interface{}]interface{})["contents"].(map[interface{}]interface{})["source"])
+				contents := fmt.Sprintf("%v", files[i].Contents.Source)
 				if strings.Contains(contents, ";base64,") {
 					contents = strings.Split(contents, ";base64,")[1]
 					contentsBytes, _ := base64.StdEncoding.DecodeString(contents)
