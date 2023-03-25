@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -16,7 +17,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 	List6Item = list_item_name
 	TextView.Clear()
 
-	ActivePathBox.SetText(List1Item + " -> " + List2Item + " -> " + List3Item + " -> " + List4Item + " -> " + List5Item + " -> " + List6Item)
+	ActivePathBox.SetText(List1Item + " > " + List2Item + " > " + List3Item + " > " + List4Item + " > " + List5Item + " > " + List6Item)
 	if List1Item == "Projects" && List3Item == "Pods" {
 		// Print Container's logs
 		TextView.Clear()
@@ -26,30 +27,28 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = string(File)
 
 	} else if List1Item == "Projects" && List3Item == "Deployment" && List6Item == "Info" {
-		// Get projects deployments "if exists"
-		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/deployments.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
+		// Get a project's deployments "if exists"
+		yfile, _ := os.ReadFile(Namespaces_Path + List2Item + "/apps/deployments.yaml")
 
-		if len(x) > 0 {
+		MyDeployments := DEPLOYMENTS{}
+		yaml.Unmarshal(yfile, &MyDeployments)
+
+		if len(MyDeployments.Items) > 0 {
 			Output = []string{"NAME" + "|" + "READY" + "|" + "UP-TO-DATE" + "|" + "AVAILABLE" + "|" + "AGE"}
-			for i := 0; i < len(x); i++ {
-				if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-					y := x[i].(map[interface{}]interface{})
+			for i := 0; i < len(MyDeployments.Items); i++ {
+				if MyDeployments.Items[i].Metadata.Name == List4Item {
+
 					now := time.Now().UTC()
 
-					name := y["metadata"].(map[interface{}]interface{})["name"]
-					nameS := fmt.Sprintf("%v", name)
+					name := MyDeployments.Items[i].Metadata.Name
 
-					ready := y["status"].(map[interface{}]interface{})["readyReplicas"]
-					readyS := fmt.Sprintf("%v", ready)
+					readyCount := strconv.Itoa(MyDeployments.Items[i].Status.ReadyReplicas)
+
 					UpToDate := "TBA"
 					// I think I should print Ready/Avilable just like in the output of [# oc get deployment]
-					available := y["status"].(map[interface{}]interface{})["availableReplicas"]
-					availableS := fmt.Sprintf("%v", available)
+					availableCount := strconv.Itoa(MyDeployments.Items[i].Status.AvailableReplicas)
 
-					CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+					CreationTime := MyDeployments.Items[i].Metadata.CreationTimestamp
 					CreationTimeS := fmt.Sprintf("%v", CreationTime)
 					t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 					diff := now.Sub(t1).Seconds()
@@ -67,7 +66,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, nameS+"|"+readyS+"|"+UpToDate+"|"+availableS+"|"+age+"\n")
+					Output = append(Output, name+"|"+readyCount+"|"+UpToDate+"|"+availableCount+"|"+age+"\n")
 				}
 			}
 			FormatedOutput := columnize.SimpleFormat(Output)
@@ -78,13 +77,13 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextView.SetText("No Deployment resources found")
 		}
 	} else if List1Item == "Projects" && List3Item == "Deployment" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/deployments.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		for i := range x {
-			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-				yaml, _ := yaml.Marshal(x[i])
+		yfile, _ := os.ReadFile(Namespaces_Path + List2Item + "/apps/deployments.yaml")
+		MyDeployments := DEPLOYMENTS{}
+		yaml.Unmarshal(yfile, &MyDeployments)
+
+		for i := 0; i < len(MyDeployments.Items); i++ {
+			if MyDeployments.Items[i].Metadata.Name == List4Item {
+				yaml, _ := yaml.Marshal(MyDeployments.Items[i])
 				TextView.SetText(string(yaml))
 			}
 		}
@@ -92,34 +91,28 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 	} else if List1Item == "Projects" && List3Item == "DeploymentConfig" && List6Item == "Info" {
 		// Get projects deploymentconfigs "if exists"
 		// Get projects deployments "if exists"
-		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps.openshift.io/deploymentconfigs.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		if len(x) > 0 {
+		yfile, _ := ioutil.ReadFile(Namespaces_Path + List2Item + "/apps.openshift.io/deploymentconfigs.yaml")
+		MyDCs := DEPLOYMENTCONFIGS{}
+		yaml.Unmarshal(yfile, &MyDCs)
+
+		if len(MyDCs.Items) > 0 {
 			Output = []string{"NAME" + "|" + "REVISION" + "|" + "DESIRED" + "|" + "CURRENT" + "|" + "TRIGGERED BY" + "\n"}
-			for i := 0; i < len(x); i++ {
-				if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-					y := x[i].(map[interface{}]interface{})
-					name := y["metadata"].(map[interface{}]interface{})["name"]
-					nameS := fmt.Sprintf("%v", name)
-					List4.AddItem(nameS, "", 0, nil)
+			for i := 0; i < len(MyDCs.Items); i++ {
+				if MyDCs.Items[i].Metadata.Name == List4Item {
+					name := MyDCs.Items[i].Metadata.Name
+					List4.AddItem(name, "", 0, nil)
 
-					revision := y["status"].(map[interface{}]interface{})["latestVersion"]
-					revisionS := fmt.Sprintf("%v", revision)
+					revision := strconv.Itoa(MyDCs.Items[i].Status.LatestVersion)
 
-					desired := y["spec"].(map[interface{}]interface{})["replicas"]
-					desiredS := fmt.Sprintf("%v", desired)
+					desired := strconv.Itoa(MyDCs.Items[i].Spec.Replicas)
 
-					current := y["status"].(map[interface{}]interface{})["availableReplicas"]
-					currentS := fmt.Sprintf("%v", current)
+					current := strconv.Itoa(MyDCs.Items[i].Status.AvailableReplicas)
 
-					triggers := y["spec"].(map[interface{}]interface{})["triggers"].([]interface{})
+					triggers := MyDCs.Items[i].Spec.Triggers
 					triggersType := ""
 					for i := 0; i < len(triggers); i++ {
-						if triggers[i].(map[interface{}]interface{})["type"].(string) == "ImageChange" {
-							image := triggers[i].(map[interface{}]interface{})["imageChangeParams"].(map[interface{}]interface{})["from"].(map[interface{}]interface{})["name"]
-							triggersType = triggersType + "image" + "(" + image.(string) + ")"
+						if MyDCs.Items[i].Spec.Triggers[i].Type == "ImageChange" {
+							triggersType = triggersType + "image" + "(" + MyDCs.Items[i].Spec.Triggers[i].ImageChangeParams.From.Name + ")"
 						} else {
 							triggersType = triggersType + "config"
 						}
@@ -128,7 +121,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 						}
 					}
 
-					Output = append(Output, nameS+"|"+revisionS+"|"+desiredS+"|"+currentS+"|"+triggersType+"\n")
+					Output = append(Output, name+"|"+revision+"|"+desired+"|"+current+"|"+triggersType+"\n")
 				}
 			}
 			FormatedOutput := columnize.SimpleFormat(Output)
@@ -139,52 +132,47 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextView.SetText("No DeploymentConfig resources found")
 		}
 	} else if List1Item == "Projects" && List3Item == "DeploymentConfig" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps.openshift.io/deploymentconfigs.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		for i := range x {
-			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-				yaml, _ := yaml.Marshal(x[i])
+		yfile, _ := os.ReadFile(Namespaces_Path + List2Item + "/apps.openshift.io/deploymentconfigs.yaml")
+		MyDCs := DEPLOYMENTCONFIGS{}
+		yaml.Unmarshal(yfile, &MyDCs)
+
+		for i := range MyDCs.Items {
+			if MyDCs.Items[i].Metadata.Name == List4Item {
+				yaml, _ := yaml.Marshal(MyDCs.Items[i])
 				TextView.SetText(string(yaml))
 			}
 		}
 		TextView.ScrollToBeginning()
 	} else if List1Item == "Projects" && List3Item == "Daemonset" && List6Item == "Info" {
 		// Get projects daemonsets "if exists"
-		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/daemonsets.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		if len(x) > 0 {
+		yfile, _ := ioutil.ReadFile(Namespaces_Path + List2Item + "/apps/daemonsets.yaml")
+		MyDSs := DAEMONSETS{}
+		yaml.Unmarshal(yfile, &MyDSs)
+		if len(MyDSs.Items) > 0 {
 			Output = []string{"NAME" + "|" + "DESIRED" + "|" + "CURRENT" + "|" + "READY" + "|" + "UP-TO-DATE" + "|" + "AVAILABLE" + "|" + "NODE SELECTOR" + "|" + "AGE" + "\n"}
-			for i := 0; i < len(x); i++ {
-				if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
+			for i := 0; i < len(MyDSs.Items); i++ {
+				if MyDSs.Items[i].Metadata.Name == List4Item {
 					now := time.Now().UTC()
-					y := x[i].(map[interface{}]interface{})
-					name := y["metadata"].(map[interface{}]interface{})["name"]
-					nameS := fmt.Sprintf("%v", name)
+					name := MyDSs.Items[i].Metadata.Name
 
-					desired := y["status"].(map[interface{}]interface{})["desiredNumberScheduled"]
-					desiredS := fmt.Sprintf("%v", desired)
+					desired := strconv.Itoa(MyDSs.Items[i].Status.DesiredNumberScheduled)
 
-					current := y["status"].(map[interface{}]interface{})["currentNumberScheduled"]
-					currentS := fmt.Sprintf("%v", current)
+					current := strconv.Itoa(MyDSs.Items[i].Status.CurrentNumberScheduled)
 
-					ready := y["status"].(map[interface{}]interface{})["numberReady"]
-					readyS := fmt.Sprintf("%v", ready)
+					ready := strconv.Itoa(MyDSs.Items[i].Status.NumberReady)
 
-					uptodate := y["status"].(map[interface{}]interface{})["updatedNumberScheduled"]
-					uptodateS := fmt.Sprintf("%v", uptodate)
+					uptodate := strconv.Itoa(MyDSs.Items[i].Status.UpdatedNumberScheduled)
 
-					available := y["status"].(map[interface{}]interface{})["numberAvailable"]
-					availableS := fmt.Sprintf("%v", available)
+					available := strconv.Itoa(MyDSs.Items[i].Status.NumberAvailable)
 
 					// To be enhanced
-					nodeselector := y["spec"].(map[interface{}]interface{})["template"].(map[interface{}]interface{})["spec"].(map[interface{}]interface{})["nodeSelector"]
-					nodeselectorS := fmt.Sprintf("%v", nodeselector)
+					nodeSelectorS := ""
+					nodeSelector := MyDSs.Items[i].Spec.Template.Spec.NodeSelector
+					for key, value := range nodeSelector {
+						nodeSelectorS += (key + ":" + value)
+					}
 
-					CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+					CreationTime := MyDSs.Items[i].Metadata.CreationTimestamp
 					CreationTimeS := fmt.Sprintf("%v", CreationTime)
 					t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 					diff := now.Sub(t1).Seconds()
@@ -202,7 +190,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, nameS+"|"+desiredS+"|"+currentS+"|"+readyS+"|"+uptodateS+"|"+availableS+"|"+nodeselectorS+"|"+age+"|"+"\n")
+					Output = append(Output, name+"|"+desired+"|"+current+"|"+ready+"|"+uptodate+"|"+available+"|"+nodeSelectorS+"|"+age+"|"+"\n")
 				}
 				FormatedOutput := columnize.SimpleFormat(Output)
 				TextView.SetText(FormatedOutput)
@@ -213,13 +201,12 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextView.SetText("No Daemonset resources found")
 		}
 	} else if List1Item == "Projects" && List3Item == "Daemonset" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/daemonsets.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		for i := range x {
-			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-				yaml, _ := yaml.Marshal(x[i])
+		yfile, _ := os.ReadFile(Namespaces_Path + List2Item + "/apps/daemonsets.yaml")
+		MyDSs := DAEMONSETS{}
+		yaml.Unmarshal(yfile, &MyDSs)
+		for i := range MyDSs.Items {
+			if MyDSs.Items[i].Metadata.Name == List4Item {
+				yaml, _ := yaml.Marshal(MyDSs.Items[i])
 				TextView.SetText(string(yaml))
 			}
 		}
@@ -231,39 +218,22 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = ""
 		// Getting current timestamp
 		now := time.Now().UTC()
-		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/services.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
+		yfile, _ := ioutil.ReadFile(Namespaces_Path + List2Item + "/core/services.yaml")
+		MyServices := SERVICES{}
+		yaml.Unmarshal(yfile, &MyServices)
 		Output = []string{"NAME" + "|" + "TYPE" + "|" + "CLUSTER-IP" + "|" + "EXTERNAL-IP" + "|" + "PORT(S)" + "|" + "AGE" + "\n"}
-		yaml.Unmarshal(yfile, m)
-		if len(x) > 0 {
-			for i := 0; i < len(x); i++ {
-				if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-					y := x[i].(map[interface{}]interface{})
-					name := y["metadata"].(map[interface{}]interface{})["name"]
-					nameS := fmt.Sprintf("%v", name)
+		if len(MyServices.Items) > 0 {
+			for i := 0; i < len(MyServices.Items); i++ {
+				if MyServices.Items[i].Metadata.Name == List4Item {
+					name := MyServices.Items[i].Metadata.Name
 
-					Stype := y["spec"].(map[interface{}]interface{})["type"]
-					StypeS := fmt.Sprintf("%v", Stype)
+					Stype := MyServices.Items[i].Spec.Type
 
-					clusterIP := y["spec"].(map[interface{}]interface{})["clusterIP"]
-					clusterIPS := ""
-					if clusterIP == nil {
-						clusterIPS = "None"
-					} else {
-						clusterIPS = fmt.Sprintf("%v", clusterIP)
-					}
+					clusterIP := MyServices.Items[i].Spec.ClusterIP
 
-					externalIP := y["spec"].(map[interface{}]interface{})["externalName"]
-					externalIPS := ""
-					if externalIP == nil {
-						externalIPS = "None"
-					} else {
-						externalIPS = fmt.Sprintf("%v", externalIP)
-					}
+					externalName := MyServices.Items[i].Spec.ExternalName
 
-					CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+					CreationTime := MyServices.Items[i].Metadata.CreationTimestamp
 					CreationTimeS := fmt.Sprintf("%v", CreationTime)
 					t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 					diff := now.Sub(t1).Seconds()
@@ -280,23 +250,22 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 					} else if hours == "0" {
 						age = minutes + "m" + seconds + "s"
 					}
+
 					ports_proto := ""
-					if y["spec"].(map[interface{}]interface{})["ports"] != nil {
-						ports := y["spec"].(map[interface{}]interface{})["ports"].([]interface{})
-						for i := 0; i < len(ports); i++ {
-							port := ports[i].(map[interface{}]interface{})["port"]
-							portS := fmt.Sprintf("%v", port)
-							proto := ports[i].(map[interface{}]interface{})["protocol"]
-							protoS := fmt.Sprintf("%v", proto)
-							ports_proto = ports_proto + portS + "/" + protoS
-							if i != len(ports)-1 {
+					if MyServices.Items[i].Spec.Ports != nil {
+						ports := MyServices.Items[i].Spec.Ports
+						for x := 0; x < len(ports); x++ {
+							port := strconv.Itoa(MyServices.Items[i].Spec.Ports[x].Port)
+							protocol := MyServices.Items[i].Spec.Ports[x].Protocol
+							ports_proto = ports_proto + port + "/" + protocol
+							if x != len(ports)-1 {
 								ports_proto = ports_proto + ","
 							}
 						}
 					} else {
 						ports_proto = "None"
 					}
-					Output = append(Output, nameS+"|"+StypeS+"|"+clusterIPS+"|"+externalIPS+"|"+ports_proto+"|"+age+"|"+"\n")
+					Output = append(Output, name+"|"+Stype+"|"+clusterIP+"|"+externalName+"|"+ports_proto+"|"+age+"|"+"\n")
 				}
 			}
 			FormatedOutput := columnize.SimpleFormat(Output)
@@ -305,13 +274,12 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextViewData = FormatedOutput
 		}
 	} else if List1Item == "Projects" && List3Item == "Services" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/services.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		for i := range x {
-			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-				yaml, _ := yaml.Marshal(x[i])
+		yfile, _ := os.ReadFile(Namespaces_Path + List2Item + "/core/services.yaml")
+		MyServices := SERVICES{}
+		yaml.Unmarshal(yfile, MyServices)
+		for i := range MyServices.Items {
+			if MyServices.Items[i].Metadata.Name == List4Item {
+				yaml, _ := yaml.Marshal(MyServices.Items[i])
 				TextView.SetText(string(yaml))
 			}
 		}
@@ -325,42 +293,33 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		// Getting current timestamp
 		now := time.Now().UTC()
 		Output = []string{"NAME" + "|" + "HOST/PORT" + "|" + "PATH" + "|" + "SERVICES" + "|" + "PORT" + "|" + "TERMINATION" + "|" + "WILDCARD" + "|" + "AGE" + "\n"}
-		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/route.openshift.io/routes.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		if len(x) > 0 {
-			for i := 0; i < len(x); i++ {
-				if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-					y := x[i].(map[interface{}]interface{})
-					name := y["metadata"].(map[interface{}]interface{})["name"]
-					nameS := fmt.Sprintf("%v", name)
+		File, _ := ioutil.ReadFile(Namespaces_Path + List2Item + "/route.openshift.io/routes.yaml")
+		MyRoutes := ROUTES{}
+		yaml.Unmarshal(File, &MyRoutes)
 
-					host := y["spec"].(map[interface{}]interface{})["host"]
-					hostS := fmt.Sprintf("%v", host)
+		Items := MyRoutes.Items
+		if len(Items) > 0 {
+			for i := 0; i < len(Items); i++ {
+				if Items[i].Metadata.Name == List4Item {
 
-					services := y["spec"].(map[interface{}]interface{})["to"].(map[interface{}]interface{})["name"]
-					servicesS := fmt.Sprintf("%v", services)
+					name := Items[i].Metadata.Name
 
-					portS := ""
-					if y["spec"].(map[interface{}]interface{})["port"] != nil {
-						port := y["spec"].(map[interface{}]interface{})["port"].(map[interface{}]interface{})["targetPort"]
-						portS = fmt.Sprintf("%v", port)
-					} else {
-						portS = "nil"
-					}
+					host := Items[i].Spec.Host
 
-					insecureEdgeTerminationPolicy := y["spec"].(map[interface{}]interface{})["tls"].(map[interface{}]interface{})["insecureEdgeTerminationPolicy"]
-					termination := y["spec"].(map[interface{}]interface{})["tls"].(map[interface{}]interface{})["termination"]
+					services := Items[i].Spec.To.Name
+
+					port := Items[i].Spec.Port.TargetPort
+
+					insecureEdgeTerminationPolicy := Items[i].Spec.TLS.InsecureEdgeTerminationPolicy
+					termination := Items[i].Spec.TLS.Termination
 					term := ""
-					if termination == nil && insecureEdgeTerminationPolicy == nil {
+					if termination == "" && insecureEdgeTerminationPolicy == "" {
 						term = "None"
 					} else {
 						term = fmt.Sprintf("%v", termination) + "/" + fmt.Sprintf("%v", insecureEdgeTerminationPolicy)
 					}
-					wildcard := y["spec"].(map[interface{}]interface{})["wildcardPolicy"]
-					wildcardS := fmt.Sprintf("%v", wildcard)
-					CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+					wildcard := Items[i].Spec.WildcardPolicy
+					CreationTime := Items[i].Metadata.CreationTimestamp
 					CreationTimeS := fmt.Sprintf("%v", CreationTime)
 					t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 					diff := now.Sub(t1).Seconds()
@@ -378,7 +337,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, nameS+"|"+hostS+"|"+""+"|"+servicesS+"|"+portS+"|"+term+"|"+wildcardS+"|"+age+"|"+"\n")
+					Output = append(Output, name+"|"+host+"|"+""+"|"+services+"|"+port+"|"+term+"|"+wildcard+"|"+age+"|"+"\n")
 				}
 			}
 			FormatedOutput := columnize.SimpleFormat(Output)
@@ -388,13 +347,12 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 
 		}
 	} else if List1Item == "Projects" && List3Item == "Routes" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/route.openshift.io/routes.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		for i := range x {
-			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-				yaml, _ := yaml.Marshal(x[i])
+		File, _ = os.ReadFile(Namespaces_Path + List2Item + "/route.openshift.io/routes.yaml")
+		MyRoutes := ROUTES{}
+		yaml.Unmarshal(File, &MyRoutes)
+		for i := range MyRoutes.Items {
+			if MyRoutes.Items[i].Metadata.Name == List4Item {
+				yaml, _ := yaml.Marshal(MyRoutes.Items[i])
 				TextView.SetText(string(yaml))
 			}
 		}
@@ -408,31 +366,27 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		// Getting current timestamp
 		now := time.Now().UTC()
 		Output = []string{"NAMESPACE" + "|" + "NAME" + "|" + "TAGS" + "|" + "AGE 	" + "\n"}
-		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/image.openshift.io/imagestreams.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		if len(x) > 0 {
-			for i := 0; i < len(x); i++ {
-				if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-					y := x[i].(map[interface{}]interface{})
-					name := y["metadata"].(map[interface{}]interface{})["name"]
-					nameS := fmt.Sprintf("%v", name)
+		File, _ = ioutil.ReadFile(Namespaces_Path + List2Item + "/image.openshift.io/imagestreams.yaml")
+		MyImageStreams := IMAGESTREAMS{}
+		yaml.Unmarshal(File, &MyImageStreams)
+		if len(MyImageStreams.Items) > 0 {
+			for i := 0; i < len(MyImageStreams.Items); i++ {
+				if MyImageStreams.Items[i].Metadata.Name == List4Item {
+
+					name := MyImageStreams.Items[i].Metadata.Name
 
 					tagsS := ""
-					if y["spec"].(map[interface{}]interface{})["tags"] != nil {
-						all_tags := y["spec"].(map[interface{}]interface{})["tags"].([]interface{})
-						for i := 0; i < len(all_tags); i++ {
-							tag_name := all_tags[i].(map[interface{}]interface{})["name"]
-							tag_nameS := fmt.Sprintf("%v", tag_name)
-							tagsS = tagsS + tag_nameS
-							if i != len(all_tags)-1 {
+					if MyImageStreams.Items[i].Spec.Tags != nil {
+						for x := 0; x < len(MyImageStreams.Items[i].Spec.Tags); x++ {
+							tag_name := MyImageStreams.Items[i].Spec.Tags[x].Name
+							tagsS = tagsS + tag_name
+							if x != len(MyImageStreams.Items[i].Spec.Tags)-1 {
 								tagsS = tagsS + ","
 							}
 						}
 					}
 
-					CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+					CreationTime := MyImageStreams.Items[i].Metadata.CreationTimestamp
 					CreationTimeS := fmt.Sprintf("%v", CreationTime)
 					t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 					diff := now.Sub(t1).Seconds()
@@ -450,7 +404,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, List2Item+"|"+nameS+"|"+tagsS+"|"+age+"\n")
+					Output = append(Output, List2Item+"|"+name+"|"+tagsS+"|"+age+"\n")
 				}
 			}
 			FormatedOutput := columnize.SimpleFormat(Output)
@@ -459,13 +413,13 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextViewData = FormatedOutput
 		}
 	} else if List1Item == "Projects" && List3Item == "Image Stream" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/image.openshift.io/imagestreams.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		for i := range x {
-			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-				yaml, _ := yaml.Marshal(x[i])
+		File, _ = os.ReadFile(Namespaces_Path + List2Item + "/image.openshift.io/imagestreams.yaml")
+		MyImageStreams := IMAGESTREAMS{}
+		yaml.Unmarshal(File, &MyImageStreams)
+
+		for i := range MyImageStreams.Items {
+			if MyImageStreams.Items[i].Metadata.Name == List4Item {
+				yaml, _ := yaml.Marshal(MyImageStreams.Items[i])
 				TextView.SetText(string(yaml))
 			}
 		}
@@ -477,40 +431,34 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		TextViewData = ""
 		// Getting current timestamp
 		now := time.Now().UTC()
-		namespaces, _ := ioutil.ReadDir(MG_Path + "namespaces/")
+		namespaces, _ := ioutil.ReadDir(Namespaces_Path)
 		if len(namespaces) > 0 {
 			Output = []string{"NAMESPACE" + "|" + "NAME" + "|" + "STATUS" + "|" + "VOLUME" + "|" + "CAPACITY" + "|" + "ACCESS MODES" + "|" + "STORAGECLASS" + "|" + "AGE" + "\n"}
 			for projectIndex := 0; projectIndex < len(namespaces); projectIndex++ {
-				if _, err := os.Stat(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/core/persistentvolumeclaims.yaml"); err == nil {
-					yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + namespaces[projectIndex].Name() + "/core/persistentvolumeclaims.yaml")
-					m := make(map[interface{}]interface{})
-					yaml.Unmarshal(yfile, m)
-					x, _ := m["items"].([]interface{})
-					if len(x) > 0 {
-						for i := 0; i < len(x); i++ {
-							if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-								y := x[i].(map[interface{}]interface{})
-								name := y["metadata"].(map[interface{}]interface{})["name"]
-								nameS := fmt.Sprintf("%v", name)
+				if _, err := os.Stat(Namespaces_Path + namespaces[projectIndex].Name() + "/core/persistentvolumeclaims.yaml"); err == nil {
+					File, _ = ioutil.ReadFile(Namespaces_Path + namespaces[projectIndex].Name() + "/core/persistentvolumeclaims.yaml")
+					MyPVCS := PVCS{}
+					yaml.Unmarshal(File, &MyPVCS)
 
-								status := y["status"].(map[interface{}]interface{})["phase"]
-								statusS := fmt.Sprintf("%v", status)
+					if len(MyPVCS.Items) > 0 {
+						for i := 0; i < len(MyPVCS.Items); i++ {
+							if MyPVCS.Items[i].Metadata.Name == List4Item {
+								name := MyPVCS.Items[i].Metadata.Name
 
-								volume := y["spec"].(map[interface{}]interface{})["volumeName"]
-								volumeS := fmt.Sprintf("%v", volume)
+								status := MyPVCS.Items[i].Status.Phase
 
-								capacity := y["status"].(map[interface{}]interface{})["capacity"].(map[interface{}]interface{})["storage"]
-								capacityS := fmt.Sprintf("%v", capacity)
+								volume := MyPVCS.Items[i].Spec.VolumeName
 
-								access := y["status"].(map[interface{}]interface{})["accessModes"]
+								capacity := MyPVCS.Items[i].Status.Capacity.Storage
+
+								access := MyPVCS.Items[i].Status.AccessModes
 								accessS := fmt.Sprintf("%v", access)
 								accessS = strings.Replace(accessS, "[", "", -1)
 								accessS = strings.Replace(accessS, "]", "", -1)
 
-								storageC := y["spec"].(map[interface{}]interface{})["storageClassName"]
-								storageCS := fmt.Sprintf("%v", storageC)
+								storageClass := MyPVCS.Items[i].Spec.StorageClassName
 
-								CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+								CreationTime := MyPVCS.Items[i].Metadata.CreationTimestamp
 								CreationTimeS := fmt.Sprintf("%v", CreationTime)
 								t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 								diff := now.Sub(t1).Seconds()
@@ -527,7 +475,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 								} else if hours == "0" {
 									age = minutes + "m" + seconds + "s"
 								}
-								Output = append(Output, namespaces[projectIndex].Name()+"|"+nameS+"|"+statusS+"|"+volumeS+"|"+capacityS+"|"+accessS+"|"+storageCS+"|"+age+"\n")
+								Output = append(Output, namespaces[projectIndex].Name()+"|"+name+"|"+status+"|"+volume+"|"+capacity+"|"+accessS+"|"+storageClass+"|"+age+"\n")
 							}
 						}
 						FormatedOutput := columnize.SimpleFormat(Output)
@@ -539,13 +487,13 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			}
 		}
 	} else if List1Item == "Projects" && List3Item == "PVC" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/persistentvolumeclaims.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		for i := range x {
-			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-				yaml, _ := yaml.Marshal(x[i])
+		File, _ = os.ReadFile(Namespaces_Path + List2Item + "/core/persistentvolumeclaims.yaml")
+		MyPVCS := PVCS{}
+		yaml.Unmarshal(File, &MyPVCS)
+
+		for i := range MyPVCS.Items {
+			if MyPVCS.Items[i].Metadata.Name == List4Item {
+				yaml, _ := yaml.Marshal(MyPVCS.Items[i])
 				TextView.SetText(string(yaml))
 			}
 		}
@@ -559,27 +507,26 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		// Getting current timestamp
 		now := time.Now().UTC()
 		Output := []string{"NAME" + "|" + "DATA" + "|" + "AGE" + "\n"}
-		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/configmaps.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		if len(x) > 0 {
-			for i := 0; i < len(x); i++ {
-				if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-					y := x[i].(map[interface{}]interface{})
-					name := y["metadata"].(map[interface{}]interface{})["name"]
-					nameS := fmt.Sprintf("%v", name)
+		File, _ = ioutil.ReadFile(Namespaces_Path + List2Item + "/core/configmaps.yaml")
+		MyCMs := CONFIGMAPS{}
+		yaml.Unmarshal(File, &MyCMs)
+
+		if len(MyCMs.Items) > 0 {
+			for i := 0; i < len(MyCMs.Items); i++ {
+				if MyCMs.Items[i].Metadata.Name == List4Item {
+
+					name := MyCMs.Items[i].Metadata.Name
 
 					dataS := ""
-					if y["data"] != nil {
-						data := y["data"].(map[interface{}]interface{})
+					if MyCMs.Items[i].Data != nil {
+						data := MyCMs.Items[i].Data
 						dataN := len(data)
 						dataS = fmt.Sprint(dataN)
 					} else {
 						dataS = "0"
 					}
 
-					CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+					CreationTime := MyCMs.Items[i].Metadata.CreationTimestamp
 					CreationTimeS := fmt.Sprintf("%v", CreationTime)
 					t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 					diff := now.Sub(t1).Seconds()
@@ -596,7 +543,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 					} else if hours == "0" {
 						age = minutes + "m" + seconds + "s"
 					}
-					Output = append(Output, nameS+"|"+dataS+"|"+age+"\n")
+					Output = append(Output, name+"|"+dataS+"|"+age+"\n")
 				}
 			}
 			FormatedOutput := columnize.SimpleFormat(Output)
@@ -606,13 +553,12 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 
 		}
 	} else if List1Item == "Projects" && List3Item == "ConfigMap" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/configmaps.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		for i := range x {
-			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-				yaml, _ := yaml.Marshal(x[i])
+		File, _ = os.ReadFile(Namespaces_Path + List2Item + "/core/configmaps.yaml")
+		MyCMs := CONFIGMAPS{}
+		yaml.Unmarshal(File, &MyCMs)
+		for i := range MyCMs.Items {
+			if MyCMs.Items[i].Metadata.Name == List4Item {
+				yaml, _ := yaml.Marshal(MyCMs.Items[i])
 				TextView.SetText(string(yaml))
 			}
 		}
@@ -627,30 +573,27 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 		// Getting current timestamp
 		now := time.Now().UTC()
 		Output := []string{"NAME" + "|" + "TYPE" + "|" + "DATA" + "|" + "AGE" + "\n"}
-		yfile, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/secrets.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		if len(x) > 0 {
-			for i := 0; i < len(x); i++ {
-				if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-					y := x[i].(map[interface{}]interface{})
-					name := y["metadata"].(map[interface{}]interface{})["name"]
-					nameS := fmt.Sprintf("%v", name)
+		File, _ = ioutil.ReadFile(Namespaces_Path + List2Item + "/core/secrets.yaml")
+		MySecrets := SECRETS{}
+		yaml.Unmarshal(File, &MySecrets)
+
+		if len(MySecrets.Items) > 0 {
+			for i := 0; i < len(MySecrets.Items); i++ {
+				if MySecrets.Items[i].Metadata.Name == List4Item {
+					name := MySecrets.Items[i].Metadata.Name
 
 					dataS := ""
-					if y["data"] != nil {
-						data := y["data"].(map[interface{}]interface{})
+					if MySecrets.Items[i].Data != nil {
+						data := MySecrets.Items[i].Data
 						dataN := len(data)
 						dataS = fmt.Sprint(dataN)
 					} else {
 						dataS = "0"
 					}
 
-					type_key := y["type"]
-					type_keyS := fmt.Sprintf("%v", type_key)
+					type_key := MySecrets.Items[i].Type
 
-					CreationTime := y["metadata"].(map[interface{}]interface{})["creationTimestamp"]
+					CreationTime := MySecrets.Items[i].Metadata.CreationTimestamp
 					CreationTimeS := fmt.Sprintf("%v", CreationTime)
 					t1, _ := time.Parse(time.RFC3339, CreationTimeS)
 					diff := now.Sub(t1).Seconds()
@@ -668,7 +611,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 						age = minutes + "m" + seconds + "s"
 					}
 
-					Output = append(Output, nameS+"|"+type_keyS+"|"+dataS+"|"+age+"\n")
+					Output = append(Output, name+"|"+type_key+"|"+dataS+"|"+age+"\n")
 				}
 			}
 			FormatedOutput := columnize.SimpleFormat(Output)
@@ -678,13 +621,12 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 
 		}
 	} else if List1Item == "Projects" && List3Item == "Secrets" && List6Item == "YAML" {
-		yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/core/secrets.yaml")
-		m := make(map[interface{}]interface{})
-		yaml.Unmarshal(yfile, m)
-		x, _ := m["items"].([]interface{})
-		for i := range x {
-			if x[i].(map[interface{}]interface{})["metadata"].(map[interface{}]interface{})["name"] == List4Item {
-				yaml, _ := yaml.Marshal(x[i])
+		File, _ = os.ReadFile(Namespaces_Path + List2Item + "/core/secrets.yaml")
+		MySecrets := SECRETS{}
+		yaml.Unmarshal(File, &MySecrets)
+		for i := range MySecrets.Items {
+			if MySecrets.Items[i].Metadata.Name == List4Item {
+				yaml, _ := yaml.Marshal(MySecrets.Items[i])
 				TextView.SetText(string(yaml))
 			}
 		}
@@ -692,7 +634,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 	} else if List1Item == "Projects" && List3Item == "Subscriptions" && List6Item == "Info" {
 		//TBA
 	} else if List1Item == "Projects" && List3Item == "Supscriptions" && List6Item == "YAML" {
-		// yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/deployments.yaml")
+		// yfile, _ := os.ReadFile(Namespaces_Path + List2Item + "/apps/deployments.yaml")
 		// m := make(map[interface{}]interface{})
 		// yaml.Unmarshal(yfile, m)
 		// x, _ := m["items"].([]interface{})
@@ -707,7 +649,7 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 	} else if List1Item == "Projects" && List3Item == "Operators" && List6Item == "Info" {
 
 	} else if List1Item == "Projects" && List3Item == "Operators" && List6Item == "YAML" {
-		// yfile, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/apps/deployments.yaml")
+		// yfile, _ := os.ReadFile(Namespaces_Path + List2Item + "/apps/deployments.yaml")
 		// m := make(map[interface{}]interface{})
 		// yaml.Unmarshal(yfile, m)
 		// x, _ := m["items"].([]interface{})
@@ -764,5 +706,23 @@ func SixthListOnSelect(index int, list_item_name string, second string, run rune
 			TextView.SetText(NodeInfoS)
 			TextView.ScrollToBeginning()
 		}
+	} else if List1Item == "ETCD" && List2Item == "Endpoint Health" && List6Item == "JSON" {
+		File, _ = ioutil.ReadFile(ETCD_Path + "endpoint_health.json")
+		MyETCD_EP_H := ETCD_EP_H{}
+		json.Unmarshal(File, &MyETCD_EP_H)
+		File, _ = json.MarshalIndent(&MyETCD_EP_H, "", "\t")
+		TextView.SetText(string(File))
+	} else if List1Item == "ETCD" && List2Item == "Endpoint Status" && List6Item == "JSON" {
+		File, _ = ioutil.ReadFile(ETCD_Path + "endpoint_status.json")
+		MyETCD_EP_S := ETCD_EP_S{}
+		json.Unmarshal(File, &MyETCD_EP_S)
+		File, _ = json.MarshalIndent(&MyETCD_EP_S, "", "\t")
+		TextView.SetText(string(File))
+	} else if List1Item == "ETCD" && List2Item == "Member List" && List6Item == "JSON" {
+		File, _ = ioutil.ReadFile(ETCD_Path + "member_list.json")
+		MyETCD_M_L := ETCD_M_L{}
+		json.Unmarshal(File, &MyETCD_M_L)
+		File, _ = json.MarshalIndent(&MyETCD_M_L, "", "\t")
+		TextView.SetText(string(File))
 	}
 }

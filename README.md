@@ -46,10 +46,12 @@ MGR "_not the final name_" is a simple TUI interface to navigate and view OpenSh
 - Show cluster's configurations [Proxy, Oauth, ...]
 - Check CSR details "if it got collected by the must-gather command"
 
+# Recently added Features:
+- read and display ETCD details
+
 # To be added Features "TBA":
 
 - More cluster reources to be added
-- Color coding
 - Dynamically set the initial size of the interface areas according to the initial terminal size
 - Display and search containers full logs
 - Keyboard shourtcuts

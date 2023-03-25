@@ -20,13 +20,13 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 	List5.SetTitle("")
 	List6.SetTitle("")
 	List4Item = list_item_name
-	ActivePathBox.SetText(List1Item + " -> " + List2Item + " -> " + List3Item + " -> " + List4Item)
+	ActivePathBox.SetText(List1Item + " > " + List2Item + " > " + List3Item + " > " + List4Item)
 	if List1Item == "Projects" && List2Item != "All Projects" {
 		if List3Item == "Pods" {
 			// Add pod's containers to the Fifth list
 			List5.Clear()
 			List5.SetTitle("Containers")
-			filesList, _ := ioutil.ReadDir(MG_Path + "namespaces/" + List2Item + "/pods/" + List4Item)
+			filesList, _ := ioutil.ReadDir(Namespaces_Path + List2Item + "/pods/" + List4Item)
 			if len(filesList) > 0 {
 				for _, file := range filesList {
 					if file.IsDir() {
@@ -37,7 +37,7 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 				List5.AddItem("Empty", "", 0, nil)
 			}
 			// Print Pod's YAML definition
-			content, _ := os.ReadFile(MG_Path + "namespaces/" + List2Item + "/pods/" + List4Item + "/" + List4Item + ".yaml")
+			content, _ := os.ReadFile(Namespaces_Path + List2Item + "/pods/" + List4Item + "/" + List4Item + ".yaml")
 			TextView.SetText(string(content))
 			TextView.ScrollToBeginning()
 			TextViewData = TextView.GetText(false)
@@ -91,13 +91,13 @@ func FourthListOnSelect(index int, list_item_name string, second string, run run
 			// Cleaning TextView and TextViewData
 			TextView.Clear()
 			TextViewData = ""
-			file, _ := ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/operators.coreos.com/subscriptions/" + List4Item + ".yaml")
+			file, _ := ioutil.ReadFile(Namespaces_Path + List2Item + "/operators.coreos.com/subscriptions/" + List4Item + ".yaml")
 
 			TextView.SetText(string(file))
 			TextView.ScrollToBeginning()
 			TextViewData = FormatedOutput
 		} else if List3Item == "Operators" {
-			YamlFile, Err = ioutil.ReadFile(MG_Path + "namespaces/" + List2Item + "/operators.coreos.com/clusterserviceversions/" + List4Item + ".yaml")
+			YamlFile, Err = ioutil.ReadFile(Namespaces_Path + List2Item + "/operators.coreos.com/clusterserviceversions/" + List4Item + ".yaml")
 			TextView.SetText(string(YamlFile))
 			TextViewData = TextView.GetText(false)
 			TextView.ScrollToBeginning()

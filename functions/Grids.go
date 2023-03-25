@@ -19,57 +19,103 @@ func MGDropDownOnSelect() {
 	List5.Clear()
 	List6.Clear()
 	TextViewData = ""
-	IsMGDir := 0
+	// IsMGDir := 0
 	if _, value := MGDropDown.GetCurrentOption(); value != "" {
 		_, SelectedMGType := MGDropDown.GetCurrentOption()
-		MG_Path = ProvidedDirPath + SelectedMGType + "/"
-		Files, _ = ioutil.ReadDir(MG_Path)
-		for i := range Files {
-			if Files[i].Name() == "namespaces" {
-				IsMGDir++
-			} else if Files[i].Name() == "cluster-scoped-resources" {
-				IsMGDir++
-			}
-		}
-		if IsMGDir > 1 {
-			// Initialize resource Dir/File paths after getting MG_Path value
-			SetResourcesPath()
-			IsItClusterLoggingMG := "false"
-			Files, _ = ioutil.ReadDir(MG_Path)
-			for i := range Files {
-				if Files[i].Name() == "cluster-logging" {
-					IsItClusterLoggingMG = "true"
-				}
-			}
-			if IsItClusterLoggingMG == "true" {
-				List1.
-					ShowSecondaryText(false).
-					AddItem("Summary", "", 0, nil).
-					AddItem("Projects", "", 0, nil).
-					AddItem("Nodes", "", 0, nil).
-					AddItem("PV", "", 0, nil).
-					AddItem(Colors.Yellow+"Logging"+Colors.White, "", 0, nil)
 
-			} else {
-				List1.
-					ShowSecondaryText(false).
-					// AddItem("Navigate", "", 0, nil).
-					AddItem("Summary", "", 0, nil).
-					AddItem("OCP Version", "", 0, nil).
-					AddItem("Configurations", "", 0, nil).
-					AddItem("Projects", "", 0, nil).
-					AddItem("Nodes", "", 0, nil).
-					AddItem("Operators", "", 0, nil).
-					AddItem("Installed Operators", "", 0, nil).
-					AddItem("MCP", "", 0, nil).
-					AddItem("MC", "", 0, nil).
-					AddItem("PV", "", 0, nil).
-					AddItem("CSR", "", 0, nil)
-			}
-
+		if strings.Contains(SelectedMGType, "openshift-release-dev-ocp") {
+			List1.
+				ShowSecondaryText(false).
+				// AddItem("Navigate", "", 0, nil).
+				AddItem("Summary", "", 0, nil).
+				AddItem("OCP Version", "", 0, nil).
+				AddItem("Configurations", "", 0, nil).
+				AddItem("Projects", "", 0, nil).
+				AddItem("Nodes", "", 0, nil).
+				AddItem("Operators", "", 0, nil).
+				AddItem("Installed Operators", "", 0, nil).
+				AddItem("MCP", "", 0, nil).
+				AddItem("MC", "", 0, nil).
+				AddItem("PV", "", 0, nil).
+				AddItem("CSR", "", 0, nil).
+				AddItem("ETCD", "", 0, nil)
+		} else if strings.Contains(SelectedMGType, "openshift4-ose-cluster-logging-operator") {
+			List1.
+				ShowSecondaryText(false).
+				AddItem("Summary", "", 0, nil).
+				AddItem("Projects", "", 0, nil).
+				AddItem("Nodes", "", 0, nil).
+				AddItem("PV", "", 0, nil).
+				AddItem(Colors.Yellow+"Logging"+Colors.White, "", 0, nil)
 		} else {
-			TextView.SetText(Colors.Red + "Please make sure you have selected the correct MG Dir." + "\n\n" + "Click on the Help Buttion to get more details." + Colors.White)
+			TextView.SetText(Colors.Red + "Please make sure you have selected the correct MG Dir And/Or the supported MG image" + "\n\n" + "Click on the Help Buttion to get more details." + Colors.White)
 		}
+		MG_Path = ProvidedDirPath + SelectedMGType + "/"
+		SetResourcesPath()
+		/////////////////////////////
+		// TimeStampFile, _ := os.Open(ProvidedDirPath + "/timestamp")
+		// // Create new Scanner.
+		// scanner := bufio.NewScanner(TimeStampFile)
+		// result := []string{}
+		// // Use Scan.
+		// for scanner.Scan() {
+		// 	line := scanner.Text()
+		// 	// Append line to result.
+		// 	result = append(result, line)
+		// }
+		// FirstLine := strings.Split(result[0], " ")
+		// SecondLine := strings.Split(result[1], " ")
+		// MGStartDate := strings.Join(FirstLine[0:2], " ")
+		// MGEndDate := strings.Join(SecondLine[0:2], " ")
+		// TextView.SetText(MGStartDate + "\n" + MGEndDate)
+		/////////////////////////////
+
+		// MG_Path = ProvidedDirPath + SelectedMGType + "/"
+		// Files, _ = ioutil.ReadDir(MG_Path)
+		// for i := range Files {
+		// 	if Files[i].Name() == "namespaces" {
+		// 		IsMGDir++
+		// 	} else if Files[i].Name() == "cluster-scoped-resources" {
+		// 		IsMGDir++
+		// 	}
+		// }
+		// if IsMGDir > 1 {
+		// 	// Initialize resource Dir/File paths after getting MG_Path value
+		// 	SetResourcesPath()
+		// 	ItIsClusterLoggingMG := "false"
+		// 	Files, _ = ioutil.ReadDir(MG_Path)
+		// 	for i := range Files {
+		// 		if Files[i].Name() == "cluster-logging" {
+		// 			ItIsClusterLoggingMG = "true"
+		// 		}
+		// 	}
+		// 	if ItIsClusterLoggingMG == "true" {
+		// 		List1.
+		// 			ShowSecondaryText(false).
+		// 			AddItem("Summary", "", 0, nil).
+		// 			AddItem("Projects", "", 0, nil).
+		// 			AddItem("Nodes", "", 0, nil).
+		// 			AddItem("PV", "", 0, nil).
+		// 			AddItem(Colors.Yellow+"Logging"+Colors.White, "", 0, nil)
+
+		// 	} else {
+		// 		List1.
+		// 			ShowSecondaryText(false).
+		// 			// AddItem("Navigate", "", 0, nil).
+		// 			AddItem("Summary", "", 0, nil).
+		// 			AddItem("OCP Version", "", 0, nil).
+		// 			AddItem("Configurations", "", 0, nil).
+		// 			AddItem("Projects", "", 0, nil).
+		// 			AddItem("Nodes", "", 0, nil).
+		// 			AddItem("Operators", "", 0, nil).
+		// 			AddItem("Installed Operators", "", 0, nil).
+		// 			AddItem("MCP", "", 0, nil).
+		// 			AddItem("MC", "", 0, nil).
+		// 			AddItem("PV", "", 0, nil).
+		// 			AddItem("CSR", "", 0, nil)
+		// 	}
+
+		// }
 
 	}
 }
@@ -194,7 +240,7 @@ func CreateUI() {
 	TextView.
 		SetDynamicColors(true).
 		// SetWordWrap(true).
-		SetWrap(false).
+		SetWrap(true).
 		SetChangedFunc(func() {
 			App.Draw()
 		})

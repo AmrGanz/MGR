@@ -7,13 +7,13 @@ import (
 )
 
 func GetMGFiles() {
-	// Select directories under the probided MG folder and try to extract the type of each one [default, Cluseter logging, Service Mesh,...]
+	// Select directories under the provided MG folder and try to extract the type of each one [default, Cluseter logging, Service Mesh,...]
 	Args := len(os.Args)
 	if Args < 2 {
-		// Check if user procided an argument [should be the MG directory]
+		// Check if user actually provided an argument [should be the MG directory]
 		fmt.Print("Please provide the must-gather directory while runnnig this tool" + "\n")
 	} else {
-		ProvidedDirPath = os.Args[1] + "/"
+		ProvidedDirPath = os.Args[1]
 		// Try to open the provided directory
 		_, err := os.Open(ProvidedDirPath)
 		if err != nil {
