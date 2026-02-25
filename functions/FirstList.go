@@ -57,7 +57,7 @@ func FirstListOnSelect(index int, list_item_name string, second string, run rune
 			Output = append(Output, "")
 		}
 		if UpgradeChannel != "" {
-			Output = append(Output, "Upgarde channel: "+Colors.Yellow+UpgradeChannel+Colors.White)
+			Output = append(Output, "Upgrade channel: "+Colors.Yellow+UpgradeChannel+Colors.White)
 			Output = append(Output, "")
 		}
 		if ClusterID != "" {
