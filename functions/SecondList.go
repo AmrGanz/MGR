@@ -50,7 +50,7 @@ func SecondListOnSelect(index int, list_item_name string, second string, run run
 			ClusterID := MyCV.Spec.ClusterID
 			Output = append(Output, "Cluster desired version: "+Colors.Green+ClusterVersion+Colors.White)
 			Output = append(Output, "")
-			Output = append(Output, "Upgarde channel: "+Colors.Green+UpgradeChannel+Colors.White)
+			Output = append(Output, "Upgrade channel: "+Colors.Green+UpgradeChannel+Colors.White)
 			Output = append(Output, "")
 			Output = append(Output, "ClusterID: "+Colors.Green+ClusterID+Colors.White)
 			Output = append(Output, "")
